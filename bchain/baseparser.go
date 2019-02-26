@@ -271,3 +271,10 @@ func (p *BaseParser) UnpackTx(buf []byte) (*Tx, uint32, error) {
 func (p *BaseParser) EthereumTypeGetErc20FromTx(tx *Tx) ([]Erc20Transfer, error) {
 	return nil, errors.New("Not supported")
 }
+
+
+// Pivx Additions
+// GetValueSatForUnknownInput returns 0
+func (p *BaseParser) GetValueSatForUnknownInput(tx *Tx, input int) *big.Int {
+	return big.NewInt(0)
+}
