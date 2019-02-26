@@ -8,14 +8,15 @@ import (
 	"io"
     "fmt"
 
+    "encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 
 	"math/big"
 
-	"github.com/martinboehm/btcd/blockchain"
-
+    "github.com/golang/glog"
 	"github.com/juju/errors"
+    "github.com/martinboehm/btcd/blockchain"
 	"github.com/martinboehm/btcd/wire"
 	"github.com/martinboehm/btcutil/chaincfg"
 )
@@ -289,6 +290,42 @@ func (p *PivXParser) GetAddrDescForUnknownInput(tx *bchain.Tx, input int) bchain
 	return s
 }
 
+
+func (p *PivXParser) GetValueSatForUnknownInput(tx *bchain.Tx, input int) *big.Int {
+	if len(tx.Vin) > input {
+		scriptHex := tx.Vin[input].ScriptSig.Hex
+		if scriptHex != "" {
+			script, _ := hex.DecodeString(scriptHex)
+			if isZeroCoinSpendScript(script) {
+                valueSat,  err := p.GetValueSatFromZerocoinSpend(script)
+                if err != nil {
+                    glog.Warningf("tx %v: input %d unable to convert denom to big int", tx.Txid, input)
+                    return big.NewInt(0)
+                }
+                return valueSat
+            }
+		}
+	}
+    return big.NewInt(0)
+}
+
+
+// Decodes the amount from the zerocoin spend script
+func (p *PivXParser) GetValueSatFromZerocoinSpend(signatureScript []byte) (*big.Int, error) {
+    r := bytes.NewReader(signatureScript)
+    r.Seek(1, io.SeekCurrent)                       // skip opcode
+    len, err := Uint8(r)                            // get serialized coinspend size
+    if err != nil {
+        return nil, err
+    }
+    r.Seek(int64(len), io.SeekCurrent)              // and skip its bytes
+    denom, err := Uint32(r, binary.LittleEndian)    // get denomination
+    if err != nil {
+        return nil, err
+    }
+
+    return big.NewInt(int64(denom)*1e8), nil
+}
 
 
 // Checks if script is OP_ZEROCOINMINT

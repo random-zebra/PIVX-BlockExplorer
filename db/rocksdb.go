@@ -587,6 +587,7 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
 				if ita == nil {
 					// allow parser to process unknown input, some coins may implement special handling, default is to log warning
 					tai.AddrDesc = d.chainParser.GetAddrDescForUnknownInput(tx, i)
+                    tai.ValueSat = *d.chainParser.GetValueSatForUnknownInput(tx, i)
 					continue
 				}
 				txAddressesMap[stxID] = ita
