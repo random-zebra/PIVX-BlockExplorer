@@ -473,7 +473,7 @@ func formatUnixTime(ut int64) string {
 }
 
 func formatTime(t time.Time) string {
-	return t.Format(time.RFC1123)
+	return t.UTC().Format(time.RFC1123)
 }
 
 // for now return the string as it is
