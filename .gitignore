@@ -14,3 +14,4 @@ build/*.deb
 .bin-image
 .deb-image
 \.idea/
+/.project
