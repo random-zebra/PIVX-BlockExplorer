@@ -11,6 +11,7 @@ import (
 // PivXRPC is an interface to JSON-RPC bitcoind service.
 type PivXRPC struct {
 	*btc.BitcoinRPC
+    BitcoinGetChainInfo func() (*bchain.ChainInfo, error)
 }
 
 // NewPivXRPC returns new PivXRPC instance.
@@ -22,6 +23,7 @@ func NewPivXRPC(config json.RawMessage, pushHandler func(bchain.NotificationType
 
 	s := &PivXRPC{
 		b.(*btc.BitcoinRPC),
+        b.GetChainInfo,
 	}
 	s.RPCMarshaler = btc.JSONMarshalerV1{}
 	s.ChainConfig.SupportsEstimateFee = true
@@ -55,4 +57,94 @@ func (b *PivXRPC) Initialize() error {
 	glog.Info("rpc: block chain ", params.Name)
 
 	return nil
+}
+
+
+// getinfo
+
+type CmdGetInfo struct {
+	Method string `json:"method"`
+}
+
+type ResGetInfo struct {
+	Error  *bchain.RPCError `json:"error"`
+	Result struct {
+        MoneySupply   json.Number `json:"moneysupply"`
+        ZerocoinSupply  bchain.ZCdenoms    `json:"zPIVsupply"`
+	} `json:"result"`
+}
+
+// getmasternodecount
+
+type CmdGetMasternodeCount struct {
+	Method string `json:"method"`
+}
+
+type ResGetMasternodeCount struct {
+	Error  *bchain.RPCError `json:"error"`
+    Result struct {
+        Total   int    `json:"total"`
+        Stable   int    `json:"stable"`
+        Enabled   int    `json:"enabled"`
+        InQueue   int    `json:"inqueue"`
+	} `json:"result"`
+}
+
+// getnextsuperblock
+
+type CmdGetNextSuperblock struct {
+	Method string `json:"method"`
+}
+
+type ResGetNextSuperblock struct {
+	Error  *bchain.RPCError `json:"error"`
+	Result uint32           `json:"result"`
+}
+
+// GetChainInfo returns information about the connected backend
+// PIVX adds MoneySupply and ZerocoinSupply to btc implementation
+func (b *PivXRPC) GetChainInfo() (*bchain.ChainInfo, error) {
+    rv, err := b.BitcoinGetChainInfo()
+    if err != nil {
+        return nil, err
+    }
+
+	glog.V(1).Info("rpc: getinfo")
+
+    resGi := ResGetInfo{}
+    err = b.Call(&CmdGetInfo{Method: "getinfo"}, &resGi)
+    if err != nil {
+        return nil, err
+    }
+    if resGi.Error != nil {
+        return nil, resGi.Error
+    }
+    rv.MoneySupply = resGi.Result.MoneySupply
+    rv.ZerocoinSupply = resGi.Result.ZerocoinSupply
+
+    glog.V(1).Info("rpc: getmasternodecount")
+
+    resMc := ResGetMasternodeCount{}
+    err = b.Call(&CmdGetMasternodeCount{Method: "getmasternodecount"}, &resMc)
+    if err != nil {
+        return nil, err
+    }
+    if resMc.Error != nil {
+        return nil, resMc.Error
+    }
+    rv.MasternodeCount = resMc.Result.Enabled
+
+    glog.V(1).Info("rpc: getnextsuperblock")
+
+    resNs := ResGetNextSuperblock{}
+    err = b.Call(&CmdGetNextSuperblock{Method: "getnextsuperblock"}, &resNs)
+    if err != nil {
+        return nil, err
+    }
+    if resNs.Error != nil {
+        return nil, resNs.Error
+    }
+    rv.NextSuperBlock = resNs.Result
+
+	return rv, nil
 }
