@@ -1,108 +1,140 @@
-{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbook}}{{$be := .Info.Backend}}
-<h1>Application status</h1>
+formatAmount0{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbook}}{{$be := .Info.Backend}}{{$blocks := .Blocks}}{{$zcs := $be.ZerocoinSupply}}
 {{- if $bb.InitialSync -}}
 <h3 class="bg-danger text-white" style="padding: 20px;">Application is now in initial synchronization and does not provide any data.</h3>
 {{- end -}}
 {{- if not $bb.SyncMode -}}
 <h3 class="bg-warning text-white" style="padding: 20px;">Synchronization with backend is disabled, the state of index is not up to date.</h3>
 {{- end -}}
+{{- if .InternalExplorer -}}
+<h1 align="center">{{.CoinLabel}} Block Explorer</h1>
+<br>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8 form-group">
+        <form id="search" action="/search" method="get">
+            <input name="q" type="text" class="form-control" placeholder="Search for block, transaction or address" focus="true">
+        </form>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+{{- end -}}
 <div class="row">
     <div class="col-md-6">
-        <h3>Blockbook</h3>
+        <h3>Block index</h3>
         <table class="table data-table">
             <tbody>
                 <tr>
-                    <td style="width: 33%;">Coin</td>
-                    <td class="data">{{$bb.Coin}}</td>
+                    <td style="width: 30%;">Last Indexed Block</td>
+                    <td class="data">
+                        {{- if .InternalExplorer -}}
+                            <a href="/block/{{$bb.BestHeight}}">{{$bb.BestHeight}}</a>
+                        {{else}}
+                            {{$bb.BestHeight}}
+                        {{- end -}}
+                    </td>
                 </tr>
                 <tr>
-                    <td>Host</td>
-                    <td class="data">{{$bb.Host}}</td>
-                </tr>
-                <tr>
-                    <td>Version / Commit / Build</td>
-                    <td class="data">{{$bb.Version}} / <a href="https://github.com/trezor/blockbook/commit/{{$bb.GitCommit}}" target="_blank" rel="noopener noreferrer">{{$bb.GitCommit}}</a> / {{$bb.BuildTime}}</td>
-                </tr>
-                <tr>
-                    <td>Synchronized</td>
-                    <td class="data {{if not $bb.InSync}}text-danger{{else}}text-success{{end}}">{{$bb.InSync}}</td>
-                </tr>
-                <tr>
-                    <td>Last Block</td>
-                    <td class="data">{{if .InternalExplorer}}<a href="/block/{{$bb.BestHeight}}">{{$bb.BestHeight}}</a>{{else}}{{$bb.BestHeight}}{{end}}</td>
+                    <td>Best Block Hash</td>
+                    <td class="data ellipsis">{{$be.Bestblockhash}}</td>
                 </tr>
                 <tr>
                     <td>Last Block Update</td>
                     <td class="data">{{formatTime $bb.LastBlockTime}}</td>
                 </tr>
                 <tr>
-                    <td>Mempool in Sync</td>
-                    <td class="data {{if not $bb.InSyncMempool}}text-danger{{else}}text-success{{end}}">{{$bb.InSyncMempool}}</td>
+                    <td>Difficulty</td>
+                    <td class="data">{{$be.Difficulty}}</td>
                 </tr>
                 <tr>
-                    <td>Last Mempool Update</td>
-                    <td class="data">{{formatTime $bb.LastMempoolTime}}</td>
+                    <td>Total Money Supply</td>
+                    <td class="data">{{formatAmount2 $be.MoneySupply}}&nbsp;{{$cs}}</td>
+                </tr>
+                <tr title="amount and % over total money supply">
+                    <td>Zerocoin Supply</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_TOT}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_TOT $be.MoneySupply}})</em></td>
                 </tr>
                 <tr>
-                    <td>Transactions in Mempool</td>
-                    <td class="data">{{if .InternalExplorer}}<a href="/mempool">{{$bb.MempoolSize}}</a>{{else}}{{$bb.MempoolSize}}{{end}}</td>
+                    <td>Masternode Count</td>
+                    <td class="data ellipsis">{{$be.MasternodeCount}}</td>
                 </tr>
                 <tr>
-                    <td>Size On Disk</td>
-                    <td class="data">{{$bb.DbSize}}</td>
+                    <td>Next Superblock</td>
+                    <td class="data">{{$be.NextSuperBlock}}</td>
                 </tr>
             </tbody>
         </table>
     </div>
     <div class="col-md-6">
-        <h3>Backend</h3>
+        <h3>Zerocoin supply</h3>
         <table class="table data-table">
             <tbody>
-                <tr>
-                    <td style="width: 30%;">Chain</td>
-                    <td class="data">{{$be.Chain}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>1-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_1 1}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_1}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_1 $be.MoneySupply}})</em></td>
                 </tr>
-                <tr>
-                    <td>Version</td>
-                    <td class="data">{{$be.Version}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>5-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_5 5}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_5}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_5 $be.MoneySupply}})</em></td>
                 </tr>
-                <tr>
-                    <td>Subversion</td>
-                    <td class="data">{{$be.Subversion}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>10-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_10 10}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_10}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_10 $be.MoneySupply}})</em></td>
                 </tr>
-                <tr>
-                    <td>Protocol Version</td>
-                    <td class="data">{{$be.ProtocolVersion}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>50-denom</em></td>
+                    <td style="width: 10%;" align="center" class="data">{{formatDenom $zcs.Denom_50 50}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_50}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_50 $be.MoneySupply}})</em></td>
                 </tr>
-                <tr>
-                    <td>Last Block</td>
-                    <td class="data">{{$be.Blocks}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>100-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_100 100}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_100}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_100 $be.MoneySupply}})</em></td>
                 </tr>
-                <tr>
-                    <td>Difficulty</td>
-                    <td class="data">{{$be.Difficulty}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>500-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_500 500}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_500}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_500 $be.MoneySupply}})</em></td>
                 </tr>
-                {{- if $be.Timeoffset -}}
-                <tr>
-                    <td>Timeoffset</td>
-                    <td class="data">{{$be.Timeoffset}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>1000-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_1000 1000}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_1000}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_1000 $be.MoneySupply}})</em></td>
                 </tr>
-                {{- end -}}
-                {{- if $be.SizeOnDisk -}}
-                <tr>
-                    <td>Size On Disk</td>
-                    <td class="data">{{$be.SizeOnDisk}}</td>
+                <tr title="amount and % over total supply">
+                    <td align="right"> <em>5000-denom</em></td>
+                    <td align="center" class="data">{{formatDenom $zcs.Denom_5000 5000}}</td>
+                    <td><span class="data">{{formatAmount0 $zcs.Denom_5000}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_5000 $be.MoneySupply}})</em></td>
                 </tr>
-                {{- end -}}
-                {{- if $be.Warnings -}}
-                <tr>
-                    <td>Warnings</td>
-                    <td class="data text-warning">{{$be.Warnings}}</td>
-                </tr>
-                {{- end -}}
             </tbody>
         </table>
     </div>
 </div>
-<span class="text-muted">{{$bb.About}}</span>
+<h3 style="display: inline;">Last blocks</h3> &nbsp;(<a href='/blocks'>see all</a>)
+<div class="data-div">
+    <table class="table table-striped data-table table-hover">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Height</th>
+                <th style="width: 48%;">Hash</th>
+                <th>Timestamp</th>
+                <th class="text-right" title="number of Transactions in block" style="width: 10%;">TXs</th>
+                <th class="text-right" title="size in Bytes" style="width: 10%;">Size</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{- range $b := $blocks.Blocks -}}
+            <tr>
+                <td><a href="/block/{{$b.Height}}">{{$b.Height}}</a></td>
+                <td class="ellipsis">{{$b.Hash}}</td>
+                <td>{{formatUnixTime $b.Time}}</td>
+                <td class="text-right">{{$b.Txs}}</td>
+                <td class="text-right">{{$b.Size}}</td>
+            </tr>
+            {{- end -}}
+        </tbody>
+    </table>
+</div>
 {{end}}

@@ -1,4 +1,4 @@
-{{define "specific"}}{{$cs := .CoinShortcut}}{{$b := .Block}}{{$data := . -}}
+{{define "specific"}}{{$cs := .CoinShortcut}}{{$b := .Block}}{{$data := . -}}{{$zcs := $b.ZerocoinSupply}}
 <h1>Block {{$b.Height}}</h1>
 <div class="alert alert-data ellipsis">
     <span class="data">{{$b.Hash}}</span>
@@ -36,6 +36,10 @@
                     <td>Size (bytes)</td>
                     <td class="data">{{$b.Size}}</td>
                 </tr>
+                <tr>
+                    <td>Total Supply</td>
+                    <td class="data">{{formatAmount2 $b.MoneySupply}} {{$cs}}</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -61,6 +65,10 @@
                 <tr>
                     <td>Difficulty</td>
                     <td class="data ellipsis">{{$b.Difficulty}}</td>
+                </tr>
+                <tr>
+                    <td>Zerocoin Supply</td>
+                    <td class="data">{{formatAmount0 $b.ZerocoinSupply.Denom_TOT}} {{$cs}}&nbsp;<em>({{getPercent $zcs.Denom_TOT $b.MoneySupply}})</em></td>
                 </tr>
             </tbody>
         </table>
