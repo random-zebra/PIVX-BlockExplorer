@@ -166,7 +166,7 @@ type ChainInfo struct {
     MoneySupply   json.Number `json:"moneysupply"`
     ZerocoinSupply  ZCdenoms    `json:"zPIVsupply"`
     MasternodeCount int `json:"masternodecount"`
-    NextSuperBlock uint32 `json:"masternodecount"`
+    NextSuperBlock int `json:"masternodecount"`
 }
 
 // RPCError defines rpc error returned by backend

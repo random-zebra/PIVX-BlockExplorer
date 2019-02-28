@@ -90,15 +90,9 @@ type ResGetMasternodeCount struct {
 	} `json:"result"`
 }
 
-// getnextsuperblock
-
-type CmdGetNextSuperblock struct {
-	Method string `json:"method"`
-}
-
-type ResGetNextSuperblock struct {
-	Error  *bchain.RPCError `json:"error"`
-	Result uint32           `json:"result"`
+// GetNextSuperBlock returns the next superblock height after nHeight
+func (b *PivXRPC) GetNextSuperBlock(nHeight int) int {
+    return nHeight - nHeight % nBlocksPerPeriod + nBlocksPerPeriod
 }
 
 // GetChainInfo returns information about the connected backend
@@ -134,17 +128,7 @@ func (b *PivXRPC) GetChainInfo() (*bchain.ChainInfo, error) {
     }
     rv.MasternodeCount = resMc.Result.Enabled
 
-    glog.V(1).Info("rpc: getnextsuperblock")
-
-    resNs := ResGetNextSuperblock{}
-    err = b.Call(&CmdGetNextSuperblock{Method: "getnextsuperblock"}, &resNs)
-    if err != nil {
-        return nil, err
-    }
-    if resNs.Error != nil {
-        return nil, resNs.Error
-    }
-    rv.NextSuperBlock = resNs.Result
+    rv.NextSuperBlock = b.GetNextSuperBlock(rv.Headers)
 
 	return rv, nil
 }
