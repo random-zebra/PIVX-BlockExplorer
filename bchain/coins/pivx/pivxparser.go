@@ -12,6 +12,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
+    "math"
 	"math/big"
 
     "github.com/golang/glog"
@@ -39,6 +40,9 @@ const (
     // Dummy Internal Addresses
     CBASE_ADDR_INT = 0xf7
     CSTAKE_ADDR_INT = 0xf8
+
+    // Number of blocks per budget cycle
+    nBlocksPerPeriod = 43200
 )
 
 var (
@@ -196,7 +200,7 @@ func (p *PivXParser) TxFromMsgTx(t *wire.MsgTx, parseAddresses bool) bchain.Tx {
 			// missing: Type,
 		}
         if s.Hex == "" {
-            if blockchain.IsCoinBaseTx(t) {
+            if blockchain.IsCoinBaseTx(t) && !isZeroCoinSpendScript(t.TxIn[0].SignatureScript){
                 s.Hex = fmt.Sprintf("%02x", CBASE_ADDR_INT)
             } else {
                 s.Hex = fmt.Sprintf("%02x", CSTAKE_ADDR_INT)
@@ -350,5 +354,5 @@ func isCoinStakeFakeAddr(signatureScript []byte) bool {
 
 // Checks if a Tx is coinbase
 func isCoinbaseTx(tx bchain.Tx) bool {
-    return len(tx.Vin) == 1 && tx.Vin[0].Coinbase != ""
+    return len(tx.Vin) == 1 && tx.Vin[0].Coinbase != "" && tx.Vin[0].Sequence == math.MaxUint32
 }
