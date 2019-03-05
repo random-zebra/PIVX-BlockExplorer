@@ -162,6 +162,7 @@ func (s *PublicServer) ConnectFullPublicInterface() {
 		serveMux.HandleFunc(path+"api/v1/block/", s.jsonHandler(s.apiBlock, apiV1))
 		serveMux.HandleFunc(path+"api/v1/sendtx/", s.jsonHandler(s.apiSendTx, apiV1))
 		serveMux.HandleFunc(path+"api/v1/estimatefee/", s.jsonHandler(s.apiEstimateFee, apiV1))
+        serveMux.HandleFunc(path+"api/v1/findzcserial/", s.jsonHandler(s.apiFindzcserial, apiV1))
 	}
 	serveMux.HandleFunc(path+"api/block-index/", s.jsonHandler(s.apiBlockIndex, apiDefault))
 	serveMux.HandleFunc(path+"api/tx-specific/", s.jsonHandler(s.apiTxSpecific, apiDefault))
@@ -171,6 +172,7 @@ func (s *PublicServer) ConnectFullPublicInterface() {
 	serveMux.HandleFunc(path+"api/block/", s.jsonHandler(s.apiBlock, apiDefault))
 	serveMux.HandleFunc(path+"api/sendtx/", s.jsonHandler(s.apiSendTx, apiDefault))
 	serveMux.HandleFunc(path+"api/estimatefee/", s.jsonHandler(s.apiEstimateFee, apiDefault))
+    serveMux.HandleFunc(path+"api/findzcserial/", s.jsonHandler(s.apiFindzcserial, apiDefault))
 	// v2 format
 	serveMux.HandleFunc(path+"api/v2/block-index/", s.jsonHandler(s.apiBlockIndex, apiV2))
 	serveMux.HandleFunc(path+"api/v2/tx-specific/", s.jsonHandler(s.apiTxSpecific, apiV2))
@@ -180,6 +182,7 @@ func (s *PublicServer) ConnectFullPublicInterface() {
 	serveMux.HandleFunc(path+"api/v2/block/", s.jsonHandler(s.apiBlock, apiV2))
 	serveMux.HandleFunc(path+"api/v2/sendtx/", s.jsonHandler(s.apiSendTx, apiV2))
 	serveMux.HandleFunc(path+"api/v2/estimatefee/", s.jsonHandler(s.apiEstimateFee, apiV2))
+    serveMux.HandleFunc(path+"api/v2/findzcserial/", s.jsonHandler(s.apiFindzcserial, apiV2))
 	// socket.io interface
 	serveMux.Handle(path+"socket.io/", s.socketio.GetHandler())
 	// websocket interface
@@ -950,6 +953,21 @@ func (s *PublicServer) apiEstimateFee(r *http.Request, apiVersion int) (interfac
 		}
 	}
 	return nil, api.NewAPIError("Missing parameter 'number of blocks'", true)
+}
+
+
+func (s *PublicServer) apiFindzcserial(r *http.Request, apiVersion int) (interface{}, error) {
+    s.metrics.ExplorerViews.With(common.Labels{"action": "api-findzcserial"}).Inc()
+    if i := strings.LastIndexByte(r.URL.Path, '/'); i > 0 {
+        serialHex := r.URL.Path[i+1:]
+        txid, err := s.chain.Findzcserial(serialHex)
+        if err != nil {
+            return nil, err
+        }
+        return txid, nil
+    }
+
+    return nil, api.NewAPIError("Missing parameter 'serialHex'", true)
 }
 
 

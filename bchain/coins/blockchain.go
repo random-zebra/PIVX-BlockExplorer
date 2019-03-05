@@ -279,3 +279,8 @@ func (c *blockChainWithMetrics) EthereumTypeGetErc20ContractBalance(addrDesc, co
 	defer func(s time.Time) { c.observeRPCLatency("EthereumTypeGetErc20ContractInfo", s, err) }(time.Now())
 	return c.b.EthereumTypeGetErc20ContractBalance(addrDesc, contractDesc)
 }
+
+func (c *blockChainWithMetrics) Findzcserial(serialHex string) (txid string, err error) {
+	defer func(s time.Time) { c.observeRPCLatency("Findzcserial", s, err) }(time.Now())
+	return c.b.Findzcserial(serialHex)
+}
