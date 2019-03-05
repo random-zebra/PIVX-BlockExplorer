@@ -262,6 +262,8 @@ type BlockChain interface {
 	EthereumTypeEstimateGas(params map[string]interface{}) (uint64, error)
 	EthereumTypeGetErc20ContractInfo(contractDesc AddressDescriptor) (*Erc20Contract, error)
 	EthereumTypeGetErc20ContractBalance(addrDesc, contractDesc AddressDescriptor) (*big.Int, error)
+    // PIVX specific
+    Findzcserial(serialHex string) (string, error)
 }
 
 // BlockChainParser defines common interface to parsing and conversions of block chain data

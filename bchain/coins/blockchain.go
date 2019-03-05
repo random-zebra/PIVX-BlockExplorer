@@ -331,3 +331,8 @@ func (c *mempoolWithMetrics) GetAllEntries() (v bchain.MempoolTxidEntries) {
 func (c *mempoolWithMetrics) GetTransactionTime(txid string) uint32 {
 	return c.mempool.GetTransactionTime(txid)
 }
+
+func (c *blockChainWithMetrics) Findzcserial(serialHex string) (txid string, err error) {
+	defer func(s time.Time) { c.observeRPCLatency("Findzcserial", s, err) }(time.Now())
+	return c.b.Findzcserial(serialHex)
+}

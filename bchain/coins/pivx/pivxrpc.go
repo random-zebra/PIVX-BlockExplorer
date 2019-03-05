@@ -133,3 +133,37 @@ func (b *PivXRPC) GetChainInfo() (*bchain.ChainInfo, error) {
 
 	return rv, nil
 }
+
+// findserial
+type CmdFindSerial struct {
+	Method string   `json:"method"`
+	Params []string `json:"params"`
+}
+
+type ResFindSerial struct {
+	Error  *bchain.RPCError `json:"error"`
+	Result struct {
+		Success bool      `json:"success"`
+		Txid    string    `json:"txid"`
+	} `json:"result"`
+}
+
+func (b *PivXRPC) Findzcserial(serialHex string) (string, error) {
+    glog.V(1).Info("rpc: findserial")
+
+	res := ResFindSerial{}
+	req := CmdFindSerial{Method: "findserial"}
+	req.Params = []string{serialHex}
+	err := b.Call(&req, &res)
+
+	if err != nil {
+		return "", err
+	}
+	if res.Error != nil {
+		return "", res.Error
+	}
+    if !res.Result.Success {
+		return "Serial not found in blockchain", nil
+	}
+	return res.Result.Txid, nil
+}
