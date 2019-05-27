@@ -138,6 +138,7 @@ func (s *PublicServer) ConnectFullPublicInterface() {
 		serveMux.HandleFunc(path+"block/", s.htmlTemplateHandler(s.explorerBlock))
 		serveMux.HandleFunc(path+"spending/", s.htmlTemplateHandler(s.explorerSpendingTx))
 		serveMux.HandleFunc(path+"sendtx", s.htmlTemplateHandler(s.explorerSendTx))
+        serveMux.HandleFunc(path+"charts", s.htmlTemplateHandler(s.explorerCharts))
 	} else {
 		// redirect to wallet requests for tx and address, possibly to external site
 		serveMux.HandleFunc(path+"tx/", s.txRedirect)
@@ -382,6 +383,7 @@ const (
 	blocksTpl
 	blockTpl
 	sendTransactionTpl
+    chartsTpl
 
 	tplCount
 )
@@ -409,6 +411,7 @@ type TemplateData struct {
 	TOSLink          string
 	SendTxHex        string
 	Status           string
+    ChartData        string
 }
 
 func (s *PublicServer) parseTemplates() []*template.Template {
@@ -469,6 +472,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
     t[statusTpl] = createTemplate("./static/templates/status.html", "./static/templates/base.html")
 	t[blocksTpl] = createTemplate("./static/templates/blocks.html", "./static/templates/paging.html", "./static/templates/base.html")
 	t[sendTransactionTpl] = createTemplate("./static/templates/sendtx.html", "./static/templates/base.html")
+    t[chartsTpl] = createTemplate("./static/templates/charts.html", "./static/templates/base.html")
 	if s.chainParser.GetChainType() == bchain.ChainEthereumType {
 		t[txTpl] = createTemplate("./static/templates/tx.html", "./static/templates/txdetail_ethereumtype.html", "./static/templates/base.html")
 		t[addressTpl] = createTemplate("./static/templates/address.html", "./static/templates/txdetail_ethereumtype.html", "./static/templates/paging.html", "./static/templates/base.html")
@@ -709,6 +713,18 @@ func (s *PublicServer) explorerSendTx(w http.ResponseWriter, r *http.Request) (t
 		}
 	}
 	return sendTransactionTpl, data, nil
+}
+
+func (s *PublicServer) explorerCharts(w http.ResponseWriter, r *http.Request) (tpl, *TemplateData, error) {
+	data := s.newTemplateData()
+    absPath, _ := filepath.Abs("../plot_data/zpivsupplydata.json")
+    jsonFile, err := ioutil.ReadFile(absPath)
+    // Load data from json
+    if err != nil {
+        return errorTpl, nil, err
+    }
+    data.ChartData = string(jsonFile)
+	return chartsTpl, data, nil
 }
 
 func getPagingRange(page int, total int) ([]int, int, int) {

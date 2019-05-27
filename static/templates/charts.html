@@ -1,0 +1,232 @@
+{{define "specific" -}}{{$data := .ChartData}}
+<h1>Charts</h1>
+
+<h3>Zerocoin Supply</h3>
+<br>
+<div class="d-flex justify-content-between">
+    <div>
+        <div class="form-check form-check-inline">
+          <input name="rInterval" type="radio" id="radio1" class="form-check-input" checked onclick="loadChart(0)">
+          <label for="radio1" class="form-check-label">All Time</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input name="rInterval" type="radio" id="radio2" class="form-check-input" onclick="loadChart(5256)">
+          <label for="radio2" class="form-check-label">Last Year</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input name="rInterval" type="radio" id="radio3" class="form-check-input" onclick="loadChart(432)">
+          <label for="radio3" class="form-check-label">Last Month</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input name="rInterval" type="radio" id="radio4" class="form-check-input" onclick="loadChart(100)">
+          <label for="radio4" class="form-check-label">Last Week</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input name="rInterval" type="radio" id="radio5" class="form-check-input" onclick="loadChart(15)">
+          <label for="radio5" class="form-check-label">Last 24 hrs</label>
+        </div>
+    </div>
+    <div>
+        <div class="form-check form-check-inline">
+          <input name="rYAxis" type="radio" id="radio6" class="form-check-input" checked onclick="setScale('linear')">
+          <label for="radio6" class="form-check-label">Linear</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input name="rYAxis" type="radio" id="radio7" class="form-check-input" onclick="setScale('logarithmic')">
+          <label for="radio7" class="form-check-label">Logarithmic</label>
+        </div>
+    </div>
+</div>
+<canvas id="zpivsupplyChart" width="1600" height="900" style="margin-top: 5px"></canvas>
+
+<script type="text/javascript">
+    supplyJson = {{$data}}
+    const zpivsupplydata = JSON.parse(supplyJson);
+    var ctx = document.getElementById("zpivsupplyChart");
+    var dataSet;
+    var blocksAxis;
+
+    function loadDataSet(timeRange) {
+        blocksAxis = [];
+        var supply1 = [];
+        var supply5 = [];
+        var supply10 = [];
+        var supply50 = [];
+        var supply100 = [];
+        var supply500 = [];
+        var supply1000 = [];
+        var supply5000 = [];
+        var supplyTotal = [];
+
+        // trim timeRange
+        var total_len = zpivsupplydata.blocks_axis.length;
+        if (timeRange > 0) {
+            var ba = zpivsupplydata.blocks_axis.slice(total_len - timeRange, total_len);
+            var zps1 = zpivsupplydata.denom_1.slice(total_len - timeRange, total_len);
+            var zps5 = zpivsupplydata.denom_5.slice(total_len - timeRange, total_len);
+            var zps10 = zpivsupplydata.denom_10.slice(total_len - timeRange, total_len);
+            var zps50 = zpivsupplydata.denom_50.slice(total_len - timeRange, total_len);
+            var zps100 = zpivsupplydata.denom_100.slice(total_len - timeRange, total_len);
+            var zps500 = zpivsupplydata.denom_500.slice(total_len - timeRange, total_len);
+            var zps1000 = zpivsupplydata.denom_1000.slice(total_len - timeRange, total_len);
+            var zps5000 = zpivsupplydata.denom_5000.slice(total_len - timeRange, total_len);
+            var zpst = zpivsupplydata.total.slice(total_len - timeRange, total_len);
+        } else {
+            // display all-time data
+            var ba = zpivsupplydata.blocks_axis;
+            var zps1 = zpivsupplydata.denom_1;
+            var zps5 = zpivsupplydata.denom_5;
+            var zps10 = zpivsupplydata.denom_10;
+            var zps50 = zpivsupplydata.denom_50;
+            var zps100 = zpivsupplydata.denom_100;
+            var zps500 = zpivsupplydata.denom_500;
+            var zps1000 = zpivsupplydata.denom_1000;
+            var zps5000 = zpivsupplydata.denom_5000;
+            var zpst = zpivsupplydata.total;
+        }
+
+        // Limit to ~120 points
+        const step = 1+Math.floor(ba.length / 120);
+        if (step > 1) {
+            for (var i = ba.length - 1; i >= 0; i--) {
+                if (i % step == 0) {
+                    blocksAxis.push(ba[i]);
+                    supply1.push(zps1[i]);
+                    supply5.push(zps5[i]);
+                    supply10.push(zps10[i]);
+                    supply50.push(zps50[i]);
+                    supply100.push(zps100[i]);
+                    supply500.push(zps500[i]);
+                    supply1000.push(zps1000[i]);
+                    supply5000.push(zps5000[i]);
+                    supplyTotal.push(zpst[i]);
+                }
+            };
+            blocksAxis.reverse();
+            supply1.reverse();
+            supply5.reverse();
+            supply10.reverse();
+            supply50.reverse();
+            supply100.reverse();
+            supply500.reverse();
+            supply1000.reverse();
+            supply5000.reverse();
+            supplyTotal.reverse();
+        } else {
+            // display all points we have
+            blocksAxis = ba;
+            supply1 = zps1;
+            supply5 = zps5;
+            supply10 = zps10;
+            supply50 = zps50;
+            supply100 = zps100;
+            supply500 = zps500;
+            supply1000 = zps1000;
+            supply5000 = zps5000;
+            supplyTotal = zpst;
+        }
+
+        dataSet = [
+            {
+                data: supplyTotal,
+                label: "Total",
+                borderColor: 'rgba(255, 0, 255, 0.4)',
+                fill: false
+            },
+            {
+                data: supply1,
+                label: "1-denom",
+                borderColor: 'rgba(200, 200, 200, 0.4)',
+                fill: false
+            },
+            {
+                data: supply5,
+                label: "5-denom",
+                borderColor: 'rgba(255, 255, 0, 0.4)',
+                fill: false
+            },
+            {
+                data: supply10,
+                label: "10-denom",
+                borderColor: 'rgba(0, 255, 255, 0.4)',
+                fill: false
+            },
+            {
+                data: supply50,
+                label: "50-denom",
+                borderColor: 'rgba(128, 128, 0, 0.4)',
+                fill: false
+            },
+            {
+                data: supply100,
+                label: "100-denom",
+                borderColor: 'rgba(0, 0, 0, 0.4)',
+                fill: false
+            },
+            {
+                data: supply500,
+                label: "500-denom",
+                borderColor: 'rgba(0, 255, 0, 0.4)',
+                fill: false
+            },
+            {
+                data: supply1000,
+                label: "1000-denom",
+                borderColor: 'rgba(0, 0, 255, 0.4)',
+                fill: false
+            },
+            {
+                data: supply5000,
+                label: "5000-denom",
+                borderColor: 'rgba(255, 0, 0, 0.4)',
+                fill: false
+            }
+        ];
+    }
+
+    window.onload = function () {
+	       loadDataSet(0);
+           chart = new Chart(ctx, {
+               type: 'line',
+               data: {
+                   labels: blocksAxis,
+                   datasets: dataSet
+               },
+               options: {
+                   legend: {
+                       position: 'bottom'
+                   },
+                   scales: {
+                       yAxes: [{
+                           scaleLabel: {
+                               display: true,
+                               labelString: 'PIV value'
+                           },
+                           type: 'linear'
+                       }],
+                       xAxes: [{
+                           scaleLabel: {
+                               display: true,
+                               labelString: 'block number'
+                           }
+                       }]
+                   }
+               }
+
+           });
+	}
+
+    function loadChart(timeFrame) {
+        loadDataSet(timeFrame);
+        chart.data.labels = blocksAxis;
+        chart.data.datasets = dataSet;
+        chart.update()
+    }
+
+    function setScale(type_str) {
+	    console.log(type_str);
+        chart.options.scales.yAxes[0].type = type_str;
+        chart.update();
+    }
+</script>
+{{- end -}}
