@@ -143,6 +143,7 @@ func (s *PublicServer) ConnectFullPublicInterface() {
 		serveMux.HandleFunc(path+"spending/", s.htmlTemplateHandler(s.explorerSpendingTx))
 		serveMux.HandleFunc(path+"sendtx", s.htmlTemplateHandler(s.explorerSendTx))
 		serveMux.HandleFunc(path+"mempool", s.htmlTemplateHandler(s.explorerMempool))
+        serveMux.HandleFunc(path+"charts", s.htmlTemplateHandler(s.explorerCharts))
 	} else {
 		// redirect to wallet requests for tx and address, possibly to external site
 		serveMux.HandleFunc(path+"tx/", s.txRedirect)
@@ -394,6 +395,7 @@ const (
 	blockTpl
 	sendTransactionTpl
 	mempoolTpl
+    chartsTpl
 
 	tplCount
 )
@@ -423,6 +425,7 @@ type TemplateData struct {
 	SendTxHex            string
 	Status               string
 	NonZeroBalanceTokens bool
+    ChartData            string
 }
 
 func (s *PublicServer) parseTemplates() []*template.Template {
@@ -852,6 +855,18 @@ func (s *PublicServer) explorerMempool(w http.ResponseWriter, r *http.Request) (
 	data.Page = mempoolTxids.Page
 	data.PagingRange, data.PrevPage, data.NextPage = getPagingRange(mempoolTxids.Page, mempoolTxids.TotalPages)
 	return mempoolTpl, data, nil
+}
+
+func (s *PublicServer) explorerCharts(w http.ResponseWriter, r *http.Request) (tpl, *TemplateData, error) {
+	data := s.newTemplateData()
+    absPath, _ := filepath.Abs("../plot_data/zpivsupplydata.json")
+    jsonFile, err := ioutil.ReadFile(absPath)
+    // Load data from json
+    if err != nil {
+        return errorTpl, nil, err
+    }
+    data.ChartData = string(jsonFile)
+	return chartsTpl, data, nil
 }
 
 func getPagingRange(page int, total int) ([]int, int, int) {
