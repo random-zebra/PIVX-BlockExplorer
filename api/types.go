@@ -307,6 +307,8 @@ type BlockInfo struct {
 	Bits          string      `json:"bits"`
 	Difficulty    string      `json:"difficulty"`
 	Txids         []string    `json:"tx,omitempty"`
+    MoneySupply   json.Number `json:"moneysupply,omitempty"`
+    ZerocoinSupply  bchain.ZCdenoms    `json:"zPIVsupply,omitempty"`
 }
 
 // Block contains information about block
@@ -352,6 +354,10 @@ type BackendInfo struct {
 	ProtocolVersion string  `json:"protocolVersion"`
 	Timeoffset      float64 `json:"timeOffset"`
 	Warnings        string  `json:"warnings"`
+    MoneySupply   json.Number `json:"moneysupply"`
+    ZerocoinSupply  bchain.ZCdenoms    `json:"zPIVsupply"`
+    MasternodeCount int `json:"masternodecount"`
+    NextSuperBlock int `json:"masternodecount"`
 }
 
 // SystemInfo contains information about the running blockbook and backend instance

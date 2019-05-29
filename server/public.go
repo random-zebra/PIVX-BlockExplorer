@@ -434,7 +434,6 @@ func (s *PublicServer) parseTemplates() []*template.Template {
 		"setTxToTemplateData":      setTxToTemplateData,
         "isOwnAddress":             isOwnAddress,
         "isOwnAddresses":           isOwnAddresses,
-		"stringInSlice":            stringInSlice,
         "formatAmount2":            formatAmount2,
         "getPercent":               getPercent,
         "formatAmount0":            formatAmount0,
