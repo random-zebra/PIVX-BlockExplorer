@@ -1,0 +1,23 @@
+{{define "specific" -}}{{$data := .ChartData}}
+<h1>Network Statistics</h1>
+Click on the legends to toggle individual data-sets.
+
+<h3>Difficulty / Block Time</h3>
+<p>Average block time (in seconds) and network difficulty over block number.</p>
+{{template "canvas_blockrange" "canv_net_01"}}
+<br>
+
+<h3>Transactions / Block Size</h3>
+<p>Average block size, average number of transactions per block and total number of transactions over block number.</p>
+{{template "canvas_blockrange" "canv_net_02"}}
+<br>
+
+<h3>Fees</h3>
+<p>Average fee per byte, amount of fees in block-range and total amount of burnt fees over block number.</p>
+{{template "canvas_blockrange" "canv_net_03"}}
+
+<script type="text/javascript">
+    network_data_Json = {{$data}}
+</script>
+<script src="../static/js/charts_network.js"></script>
+{{- end -}}

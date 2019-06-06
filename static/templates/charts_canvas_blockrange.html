@@ -1,0 +1,52 @@
+{{define "canvas_blockrange"}}{{$id := .}}
+<form>
+   <div class="form-row d-flex">
+       <div class="form-group col-sm-auto p-2 canvas-form">
+            <select class="form-control form-control-sm" id="{{$id}}" onchange="onRangeSelectChanged('{{$id}}')">
+                <option value="all" active>All Time</option>
+                <option value="last_year">Last Year</option>
+                <option value="last_month">Last Month</option>
+                <option value="last_week">Last Week</option>
+                <option value="last_day">Last 24 hrs</option>
+                <option value="custom">Block range...</option>
+            </select>
+       </div>
+       <div class="form-group col-sm-auto p-2 canvas-form">
+           <input id="{{$id}}_from" type="number" class="form-control form-control-sm" min="1" value="1" style="display: none">
+       </div>
+       <div class="form-group col-sm-auto p-2 canvas-form">
+           <input id="{{$id}}_to" type="number" class="form-control form-control-sm" min="1" value="1" style="display: none">
+       </div>
+       <div class="form-group col-sm-auto p-2 canvas-form">
+           <button id="{{$id}}_btn" type="button" class="btn btn-outline-secondary btn-sm center-block" onclick="SetChartRange('{{$id}}')" style="display: none">Reload</button>
+       </div>
+       <div class="form-group col-sm-auto p-2 ml-auto canvas-form">
+            <select class="form-control form-control-sm" onchange="SetScale(this.options[this.selectedIndex].text, MapIdToChart('{{$id}}'))">
+                <option>linear</option>
+                <option>logarithmic</option>
+            </select>
+       </div>
+       <div class="form-group col-sm-auto p-2 canvas-form">
+            <select class="form-control form-control-sm" onchange="SetXAxis(this.options[this.selectedIndex].text, MapIdToChart('{{$id}}'))">
+                <option>blocks</option>
+                <option>timestamps</option>
+            </select>
+       </div>
+   </div>
+</form>
+<div id="{{$id}}_spinner" class="spinner_wrapper">
+    <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+</div>
+<div id="{{$id}}_canvas_wrapper" style="display: none;" class="chart-container">
+    <canvas id="{{$id}}_ctx" width="1600" height="989"></canvas>
+</div>
+<button id="{{$id}}_ctx_legendbtn" class="btn btn-outline-secondary btn-sm center-block" onclick="ToggleChartLegend(MapIdToChart('{{$id}}'))" style="display: none; margin: auto;">
+    Show/Hide legend
+</button>
+{{end}}

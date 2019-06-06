@@ -11,7 +11,7 @@ body {
 }
 
 a {
-    color: #428bca;
+    color: #660099;
     text-decoration: none;
 }
 
@@ -274,7 +274,7 @@ table.data-table table.data-table th {
 }
 
 .page-link {
-    color: #428bca;
+    color: #660099;
 }
 
 .page-text {
@@ -284,11 +284,11 @@ table.data-table table.data-table th {
 }
 
 .page-link {
-    color: #428bca;
+    color: #660099;
 }
 
 .page-item.active .page-link {
-    background-color: #428bca;
+    background-color: #660099;
 }
 
 #txSpecific {
@@ -308,5 +308,78 @@ table.data-table table.data-table th {
 }
 
 .key {
-    color: #333;
+    color: #EB65F8;
+}
+
+.spinner {
+  margin: auto;
+  width: 70px;
+  height: 40px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.spinner > div {
+  border: 1px solid rgb(102, 0, 153);
+  background-color: purple;
+  background-color: rgba(102, 0, 153, 0.3);
+  margin: 0 1px 0 1px;
+  height: 100%;
+  width: 6px;
+  display: inline-block;
+
+  -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+  animation: sk-stretchdelay 1.2s infinite ease-in-out;
+}
+
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+@-webkit-keyframes sk-stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+  20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes sk-stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% {
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
+
+.spinner_wrapper {
+  width: 100px;
+  height: 80px;
+  margin: auto;
+}
+
+.chart-container {
+  position: relative;
+  margin: 20pt auto 0 auto;
+  width: 100%;
+}
+
+.canvas-form {
+    margin: 0;
+    padding: 0;
 }
