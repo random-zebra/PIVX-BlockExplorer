@@ -1,7 +1,7 @@
 {{define "canvas_blockrange"}}{{$id := .}}
 <form>
    <div class="form-row d-flex">
-       <div class="form-group col-sm-auto p-2 canvas-form">
+       <div class="form-group col-sm-auto p-2">
             <select class="form-control form-control-sm" id="{{$id}}" onchange="onRangeSelectChanged('{{$id}}')">
                 <option value="all" active>All Time</option>
                 <option value="last_year">Last Year</option>
@@ -11,22 +11,22 @@
                 <option value="custom">Block range...</option>
             </select>
        </div>
-       <div class="form-group col-sm-auto p-2 canvas-form">
-           <input id="{{$id}}_from" type="number" class="form-control form-control-sm" min="1" value="1" style="display: none">
+       <div class="form-group col-sm-auto p-2" style="display: none">
+           <input id="{{$id}}_from" type="number" class="form-control form-control-sm" min="1" value="1">
        </div>
-       <div class="form-group col-sm-auto p-2 canvas-form">
-           <input id="{{$id}}_to" type="number" class="form-control form-control-sm" min="1" value="1" style="display: none">
+       <div class="form-group col-sm-auto p-2" style="display: none">
+           <input id="{{$id}}_to" type="number" class="form-control form-control-sm" min="1" value="1">
        </div>
-       <div class="form-group col-sm-auto p-2 canvas-form">
-           <button id="{{$id}}_btn" type="button" class="btn btn-outline-secondary btn-sm center-block" onclick="SetChartRange('{{$id}}')" style="display: none">Reload</button>
+       <div class="form-group col-sm-auto p-2" style="display: none">
+           <button id="{{$id}}_btn" type="button" class="btn btn-outline-secondary btn-sm center-block" onclick="SetChartRange('{{$id}}')">Reload</button>
        </div>
-       <div class="form-group col-sm-auto p-2 ml-auto canvas-form">
+       <div class="form-group col-sm-auto p-2 ml-auto">
             <select class="form-control form-control-sm" onchange="SetScale(this.options[this.selectedIndex].text, MapIdToChart('{{$id}}'))">
                 <option>linear</option>
                 <option>logarithmic</option>
             </select>
        </div>
-       <div class="form-group col-sm-auto p-2 canvas-form">
+       <div class="form-group col-sm-auto p-2">
             <select class="form-control form-control-sm" onchange="SetXAxis(this.options[this.selectedIndex].text, MapIdToChart('{{$id}}'))">
                 <option>blocks</option>
                 <option>timestamps</option>
@@ -44,7 +44,7 @@
     </div>
 </div>
 <div id="{{$id}}_canvas_wrapper" style="display: none;" class="chart-container">
-    <canvas id="{{$id}}_ctx" width="1600" height="989"></canvas>
+    <canvas id="{{$id}}_ctx" width="1600" height="840"></canvas>
 </div>
 <button id="{{$id}}_ctx_legendbtn" class="btn btn-outline-secondary btn-sm center-block" onclick="ToggleChartLegend(MapIdToChart('{{$id}}'))" style="display: none; margin: auto;">
     Show/Hide legend

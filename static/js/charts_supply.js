@@ -334,6 +334,8 @@ function InitSupplyChart(denom_key) {
                 }
             ))
         );
+        supplyChart[denom_key].options.legend.position = 'right';
+        supplyChart[denom_key].options.legend.origPosition = 'right';
         supplyChart[denom_key].options.onResize = MinimizeChartLegend;
     }
     AddSupplyToolTip(supplyChart[denom_key]);

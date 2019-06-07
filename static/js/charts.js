@@ -219,18 +219,18 @@ function onRangeSelectChanged(sel_id) {
     const div_btn = document.getElementById(div_id3);
     if (sel_val == "custom") {
         // show hidden form for custom range
-        div_from.style.display = "block";
-        div_to.style.display = "block";
-        div_btn.style.display = "block";
+        div_from.parentNode.style.display = "block";
+        div_to.parentNode.style.display = "block";
+        div_btn.parentNode.style.display = "block";
         // init default _to value if not set
         if (div_to.value == "1") {
             div_to.value = LAST_BLOCK_NUM;
         }
     } else {
         // hide form for custom range
-        div_from.style.display = "none";
-        div_to.style.display = "none";
-        div_btn.style.display = "none";
+        div_from.parentNode.style.display = "none";
+        div_to.parentNode.style.display = "none";
+        div_btn.parentNode.style.display = "none";
         // call default func
         SetChartRange(sel_id, sel_val);
     }
@@ -284,19 +284,27 @@ function MinimizeChartLegend(chart, size, break_point) {
     if (!break_point) {
         break_point = 600;
     }
-    if (size.width < break_point && chart.options.legend.display) {
+    if (size.width < break_point) {
         // show toggle-legend button
         document.getElementById(chart.canvas.id + "_legendbtn").style.display = "block";
-        // hide legend
+        // hide legend and move it to bottom
         chart.options.legend.display = false;
+        chart.options.legend.position = 'bottom';
+        // tooltips only on intersect
+        chart.options.tooltips.intersect = true;
         // remove points
         chart.data.datasets.forEach(ds => {ds.pointRadius = 0});
         chart.update();
-    } else if (size.width >= break_point && !chart.options.legend.display) {
+    } else {
         // hide toggle-legend button
         document.getElementById(chart.canvas.id + "_legendbtn").style.display = "none";
-        // show legend
+        // restore position and show legend
+        if (chart.options.legend.origPosition) {
+            chart.options.legend.position = chart.options.legend.origPosition;
+        }
         chart.options.legend.display = true;
+        // tooltips always on hover
+        chart.options.tooltips.intersect = false;
         // restore points
         chart.data.datasets.forEach(ds => {
             if (ds.needsRadius) {
@@ -305,7 +313,6 @@ function MinimizeChartLegend(chart, size, break_point) {
                 ds.pointRadius = 1;
             }
         });
-        // restore points
         chart.update();
     }
 }

@@ -374,12 +374,6 @@ table.data-table table.data-table th {
 }
 
 .chart-container {
-  position: relative;
-  margin: 20pt auto 0 auto;
-  width: 100%;
-}
-
-.canvas-form {
-    margin: 0;
-    padding: 0;
+    margin: 0 auto;
+    width: 93%;
 }
