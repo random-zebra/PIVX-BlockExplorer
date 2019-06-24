@@ -1,7 +1,10 @@
 // blocks data
 const block_data = JSON.parse(network_data_Json);
+var bdata_totals = {
+    txs: [],
+    fees: []
+};
 const LAST_BLOCK_NUM = block_data.blocks_axis[block_data.blocks_axis.length-1];
-let fees_byte = [];
 
 // charts DOM elements
 const difficulty_ctx = document.getElementById("canv_net_01_ctx");
@@ -74,18 +77,19 @@ function GetBlocksizeDataPoints(bl_from, bl_to) {
     const step = 1+Math.floor((bl_to-bl_from) / 120);
 
     let tx_count = 0;
-    let tot_tx_count = 0;
+    let size = 0;
     for (let i = bl_from; i <= bl_to; i++) {
         tx_count += block_data.txs[i];
-        tot_tx_count += block_data.txs[i];
+        size += block_data.blocksize[i];
         if (step <= 1 || i % step == 0) {
             // add data to rangeObj
             rangeObj.blocks_axis.push(block_data.blocks_axis[i]);
             rangeObj.time_axis.push(new Date(block_data.time_axis[i]*1000).toLocaleString());
-            rangeObj.blocksize.push(block_data.size[i]);
+            rangeObj.blocksize.push(size/step);
             rangeObj.txes.push(tx_count/(100*step));
-            rangeObj.tot_txes.push(tot_tx_count);
+            rangeObj.tot_txes.push(bdata_totals.txs[i]);
             tx_count = 0;
+            size = 0;
         }
     }
 
@@ -98,7 +102,6 @@ function GetFeeDataPoints(bl_from, bl_to) {
     var rangeObj = {
         blocks_axis: [],
         time_axis: [],
-        block_fees: [],
         tot_fees: [],
         avg_fees: [],
     };
@@ -106,16 +109,13 @@ function GetFeeDataPoints(bl_from, bl_to) {
     // Limit to ~120 points
     const step = 1+Math.floor((bl_to-bl_from) / 120);
 
-    let tot_fees = 0;
     for (let i = bl_from; i <= bl_to; i++) {
-        tot_fees += block_data.fees[i];
         if (step <= 1 || i % step == 0) {
             // add data to rangeObj
             rangeObj.blocks_axis.push(block_data.blocks_axis[i]);
             rangeObj.time_axis.push(new Date(block_data.time_axis[i]*1000).toLocaleString());
-            rangeObj.block_fees.push(block_data.fees[i]);
-            rangeObj.tot_fees.push(AmountToDecimal(tot_fees, 8));
-            rangeObj.avg_fees.push(fees_byte[i]);
+            rangeObj.tot_fees.push(bdata_totals.fees[i]);
+            rangeObj.avg_fees.push(block_data.fees_perKb[i]);
         }
     }
     return rangeObj;
@@ -157,8 +157,7 @@ function SetFeeChartRange(val_from, val_to) {
      // update chart
     SetDataLabel(feeChart, rangeObj);
     feeChart.data.datasets[0].data = rangeObj.avg_fees;
-    feeChart.data.datasets[1].data = rangeObj.block_fees;
-    feeChart.data.datasets[2].data = rangeObj.tot_fees;
+    feeChart.data.datasets[1].data = rangeObj.tot_fees;
     // draw chart
     const canvID = fee_ctx.id.substring(0, fee_ctx.id.length-4);
     ShowCanvas(canvID);
@@ -167,19 +166,24 @@ function SetFeeChartRange(val_from, val_to) {
 
 // WINDOWS ON LOAD
 window.onload = function () {
-    ComputeAverages();
+    ComputeTotals();
     InitAllCharts();
 }
 
 // --- INIT FUNCTIONS ---
 
-function ComputeAverages() {
-    for (let i = 0; i < block_data.blocks_axis.length; i++) {
-        if (block_data.txs > 1) {
-            fees_byte.push(AmountToDecimal(block_data.fees / (block_data.size - 180), 8));
-        } else {
-            fees_byte.push(0);
-        }
+// Sums
+function ComputeTotals() {
+    let txs = 0;
+    for (let i = 0; i < block_data.txs.length; i++) {
+        txs += block_data.txs[i];
+        bdata_totals.txs.push(txs);
+    }
+
+    let fees = 0;
+    for (let i = 0; i < block_data.fees_ttl.length; i++) {
+        fees += AmountToDecimal(block_data.fees_ttl[i], 8);
+        bdata_totals.fees.push(fees);
     }
 }
 
@@ -265,9 +269,8 @@ function InitBlockSizeChart() {
 
 function InitFeeChart() {
     let legend1 = 'Avg. Fee per byte (PIV)';
-    let legend2 = 'Fees in blocks (PIV)';
-    let legend3 = 'TOT Burnt Fees (PIV)'
-    feeChart = InitBarChart(fee_ctx, [legend1, legend2, legend3]);
+    let legend2 = 'TOT Burnt Fees (PIV)'
+    feeChart = InitLineChart(fee_ctx, [legend1, legend2]);
     feeChart.options.tooltips.callbacks.title = tooltipTitle;
     feeChart.data.labelset = "blocks"
     feeChart.data.datasets = [
@@ -283,21 +286,13 @@ function InitFeeChart() {
         },
         {
             data: [],
-            label: "fees in blocks",
-            yAxisID: 'axis1',
-            borderColor: 'rgba(244, 217, 65, 0.7)',
-            backgroundColor: 'rgba(244, 217, 65, 0.3)',
-            borderWidth: 1
-        },
-        {
-            data: [],
             label: "total fees",
             borderColor: 'rgba(167, 66, 244, 0.8)',
             pointRadius: 2,
             needsRadius: 2,   // for resize,
             fill: false,
             type: 'line',
-            yAxisID: 'axis2'
+            yAxisID: 'axis1'
         },
     ];
     feeChart.options.onResize = MinimizeChartLegend;
