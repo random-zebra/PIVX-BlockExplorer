@@ -194,6 +194,7 @@ function InitDiffChart() {
     let legend1 = 'Difficulty';
     let legend2 = 'Avg. Blocktime (sec)';
     difficultyChart = InitLineChart(difficulty_ctx, [legend1, legend2]);
+    difficultyChart.options.tooltips.callbacks.title = tooltipTitle;
     difficultyChart.data.labelset = "blocks";
     difficultyChart.data.datasets = [
         {
@@ -225,6 +226,7 @@ function InitBlockSizeChart() {
     let legend2 = 'Avg. no. of txes per block';
     let legend3 = 'TOT no. of txes'
     blocksizeChart = InitBarChart(blocksize_ctx, [legend1, legend2, legend3]);
+    blocksizeChart.options.tooltips.callbacks.title = tooltipTitle;
     blocksizeChart.data.labelset = "blocks"
     blocksizeChart.data.datasets = [
         {
@@ -266,6 +268,7 @@ function InitFeeChart() {
     let legend2 = 'Fees in blocks (PIV)';
     let legend3 = 'TOT Burnt Fees (PIV)'
     feeChart = InitBarChart(fee_ctx, [legend1, legend2, legend3]);
+    feeChart.options.tooltips.callbacks.title = tooltipTitle;
     feeChart.data.labelset = "blocks"
     feeChart.data.datasets = [
         {

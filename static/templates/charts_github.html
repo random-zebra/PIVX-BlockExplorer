@@ -1,0 +1,38 @@
+{{define "specific" -}}{{$data := .ChartData}}
+<h1>Github Activity</h1>
+Click on the legends to toggle individual data-sets.
+
+<h3>Commits / Pull Requests</h3>
+<p>Last year weekly commit count with open, merged and closed (without merging) pull requests.</p>
+<div id="canv_git_01_spinner" class="spinner_wrapper">
+    <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+</div>
+<div id="canv_git_01_canvas_wrapper" style="display: none;" class="chart-container">
+    <canvas id="canv_git_01_ctx" width="1600" height="840"></canvas>
+</div>
+
+<h3>Community</h3>
+<p>Last year number of total forks, stargazers, subscribers and pull request contributors over time.</p>
+<div id="canv_git_02_spinner" class="spinner_wrapper">
+    <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+</div>
+<div id="canv_git_02_canvas_wrapper" style="display: none;" class="chart-container">
+    <canvas id="canv_git_02_ctx" width="1600" height="840"></canvas>
+</div>
+<script type="text/javascript">
+    github_data_Json = {{$data}}
+</script>
+<script src="../static/js/charts_github.js"></script>
+{{- end -}}

@@ -277,6 +277,7 @@ function InitSupplyChart(denom_key) {
         pointradius = 2;
     }
     supplyChart[denom_key] = InitBarChart(supply_ctx[denom_key], [legend1, legend2]);
+    supplyChart[denom_key].options.tooltips.callbacks.title = tooltipTitle;
     supplyChart[denom_key].data.labelset = "blocks"
     supplyChart[denom_key].data.datasets = [
         {
@@ -345,6 +346,7 @@ function InitSupplyChart(denom_key) {
 function InitAmountChart() {
     let legend1 = 'No. of coins';
     zpivamountChart = InitLineChart(zpivamount_ctx, [legend1]);
+    zpivamountChart.options.tooltips.callbacks.title = tooltipTitle;
     zpivamountChart.data.labelset = "blocks"
     zpivamountChart.data.datasets = DENOM_KEYS.map((x, index) => (
         {

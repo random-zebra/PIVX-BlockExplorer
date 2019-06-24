@@ -8,15 +8,7 @@ const STEPS_DAY = 15;
 
 // returns initialized charts
 function InitBarChart(ctx, y_labels) {
-    let scales1 = GetScalesFromLabels(y_labels);
-    scales1.xAxes = [{
-        stacked: true
-    }];
-    if (scales1.yAxes.length > 1) {
-        scales1.yAxes[1].stacked = true;
-    }
-
-    return new Chart(ctx, {
+    let c = new Chart(ctx, {
         type: 'bar',
         maintainAspectRatio : false,
         data: {
@@ -32,21 +24,27 @@ function InitBarChart(ctx, y_labels) {
             tooltips: {
                 position: 'nearest',
                 mode: 'index',
-                intersect: false,
-                callbacks: {
-                    title: tooltipTitle
-                }
-            },
-            scales: scales1
+                intersect: false
+            }
         },
         plugins: [verticalLinePlugin]
     });
+
+    if (y_labels && y_labels.length > 0) {
+        let scales1 = GetScalesFromLabels(y_labels);
+        scales1.xAxes = [{
+            stacked: true
+        }];
+        if (scales1.yAxes.length > 1) {
+            scales1.yAxes[1].stacked = true;
+        }
+        c.options.scales = scales1;
+    }
+    return c;
 }
 
 function InitLineChart(ctx, y_labels) {
-    let scales1 = GetScalesFromLabels(y_labels);
-
-    return new Chart(ctx, {
+    let c = new Chart(ctx, {
         type: 'line',
         maintainAspectRatio : false,
         data: {
@@ -61,15 +59,15 @@ function InitLineChart(ctx, y_labels) {
             tooltips: {
                 position: 'nearest',
                 mode: 'index',
-                intersect: false,
-                callbacks: {
-                    title: tooltipTitle
-                }
-            },
-            scales: scales1
+                intersect: false
+            }
         },
         plugins: [verticalLinePlugin]
     });
+
+    c.options.scales = GetScalesFromLabels(y_labels);
+
+    return c;
 }
 
 function InitDoughnutChart(ctx) {
@@ -129,6 +127,18 @@ function GetScalesFromLabels(y_labels) {
     let scales1 = {
         yAxes: []
     }
+
+    if (!y_labels || y_labels.length == 0) {
+        scales1.yAxes.push({
+            id: 'axis0',
+            scaleLabel: {
+                display: false
+            },
+            type: 'linear'
+        });
+        return scales1;
+    }
+
     scales1.yAxes.push({
         id: 'axis0',
         scaleLabel: {
