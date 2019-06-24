@@ -4,7 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/static/css/main.css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="{{.CoinName}} Explorer">
@@ -19,7 +22,7 @@
 <body>
     <header id="header">
         <div class="container">
-            <nav class="navbar fixed-top navbar-expand navbar-dark bg-trezor">
+            <nav class="navbar navbar-expand navbar-dark bg-trezor">
                 <a class="navbar-brand d-none d-sm-flex" href="/" title="Home">
                     <div alt="Logo" class="trezor-logo-svg-white">
                         <img src="/static/pivx.png" height="42" />
@@ -43,8 +46,13 @@
                     <li class="nav-item">
                         <a href="/blocks" class="nav-link">Blocks</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="/status" class="nav-link">Status</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Charts</a>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="/charts/supply">PIV / zPIV supply</a>
+                          <a class="dropdown-item" href="/charts/network">Network stats</a>
+                          <a class="dropdown-item" href="/charts/github">GitHub activity</a>
+                        </div>
                     </li>
                 </ul>
                 {{- if not .IsIndex -}}
@@ -59,6 +67,9 @@
                     <li class="nav-item">
                         <a href="https://pivx.org/" class="nav-link" target="_blank">PIVX.org</a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/status" class="nav-link">&#9432;</a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -71,12 +82,12 @@
     <footer id="footer" class="footer">
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-dark bg-trezor">
-                <ul class="navbar-nav flex-row">
+                <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/random-zebra" target="_blank" rel="noopener noreferrer">© 2019 Random.Zebra</a>
+                        <a class="nav-link" href="http://satoshilabs.com/" target="_blank" rel="noopener noreferrer">© 2019 SatoshiLabs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="http://satoshilabs.com/" target="_blank" rel="noopener noreferrer">© 2018 SatoshiLabs</a>
+                        <a class="nav-link" href="https://github.com/random-zebra" target="_blank" rel="noopener noreferrer">© 2019 Random.Zebra</a>
                     </li>
                 </ul>
                 <span class="d-none ml-md-auto d-sm-flex navbar-form navbar-nav">
