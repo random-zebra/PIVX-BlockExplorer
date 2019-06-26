@@ -41,8 +41,6 @@ const (
     CBASE_ADDR_INT = 0xf7
     CSTAKE_ADDR_INT = 0xf8
 
-    // Number of blocks per budget cycle
-    nBlocksPerPeriod = 43200
 )
 
 var (

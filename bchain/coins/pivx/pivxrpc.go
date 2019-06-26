@@ -93,6 +93,10 @@ type ResGetMasternodeCount struct {
 
 // GetNextSuperBlock returns the next superblock height after nHeight
 func (b *PivXRPC) GetNextSuperBlock(nHeight int) int {
+    nBlocksPerPeriod := 43200
+    if b.Testnet {
+        nBlocksPerPeriod = 144
+    }
     return nHeight - nHeight % nBlocksPerPeriod + nBlocksPerPeriod
 }
 
