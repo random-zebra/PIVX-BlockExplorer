@@ -202,6 +202,12 @@ h3 {
     float: left!important;
 }
 
+.tx-descr {
+  color: #212121!important;
+  font-style: italic;
+  font-size: 11px;
+}
+
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;

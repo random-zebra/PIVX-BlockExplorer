@@ -14,6 +14,11 @@
                         {{- range $vin := $tx.Vin -}}
                         <tr{{if isOwnAddresses $data $vin.Addresses}} class="tx-own"{{end}}>
                             <td>
+                                {{- if isP2CS $vin.Addresses -}}
+                                    <span class="tx-amt tx-descr">Cold Staking Contract</span>
+                                    <span class="ellipsis tx-addr"><span class="tx-descr">Staker:</span> {{index $vin.Addresses 0}}</span>
+                                    <span class="ellipsis tx-addr"><span class="tx-descr">Owner:</span> <a href="/address/{{index $vin.Addresses 1}}">{{index $vin.Addresses 1}}</a></span>
+                                {{- else -}}
                                 {{- if $vin.Txid -}}
                                 <a class="float-left text-muted" href="/tx/{{$vin.Txid}}" title="Outpoint {{$vin.Txid}},{{$vin.Vout}}">➡&nbsp;</a>
                                 {{- end -}}
@@ -23,8 +28,15 @@
                                 </span>
                                 {{- else -}}
                                 <span class="tx-addr">{{- if $vin.Hex -}}Unparsed address{{- else -}}No Inputs (Newly Generated Coins){{- end -}}</span>
-                                {{- end -}}{{- if $vin.Addresses -}}
-                                <span class="tx-amt">{{formatAmount $vin.ValueSat}} {{$cs}}</span>
+                                {{- end -}}
+                                {{- end -}}
+                                {{- if $vin.Addresses -}}
+                                <span class="tx-amt">
+                                  {{formatAmount $vin.ValueSat}} {{$cs}}
+                                  {{- if isP2CS $vin.Addresses -}}
+                                    <a class="float-left text-muted" href="/tx/{{$vin.Txid}}" title="Outpoint {{$vin.Txid}},{{$vin.Vout}}">➡&nbsp;</a>
+                                  {{- end -}}
+                                </span>
                                 {{- end -}}
                             </td>
                         </tr>
@@ -49,12 +61,18 @@
                         {{- range $vout := $tx.Vout -}}
                         <tr{{if isOwnAddresses $data $vout.Addresses}} class="tx-own"{{end}}>
                             <td>
+                                {{- if isP2CS $vout.Addresses -}}
+                                    <span class="tx-amt tx-descr">Cold Staking Contract</span>
+                                    <span class="ellipsis tx-addr"><span class="tx-descr">Staker:</span> {{index $vout.Addresses 0}}</span>
+                                    <span class="ellipsis tx-addr"><span class="tx-descr">Owner:</span> <a href="/address/{{index $vout.Addresses 1}}">{{index $vout.Addresses 1}}</a></span>
+                                {{- else -}}
                                 {{- range $a := $vout.Addresses -}}
                                 <span class="ellipsis tx-addr">
                                     {{- if and (ne $a $addr) $vout.Searchable}}<a href="/address/{{$a}}">{{$a}}</a>{{else}}{{$a}}{{- end -}}
                                 </span>
                                 {{- else -}}
                                 <span class="tx-addr">Unparsed address</span>
+                                {{- end -}}
                                 {{- end -}}
                                 <span class="tx-amt">
                                     {{formatAmount $vout.ValueSat}} {{$cs}} {{if $vout.Spent}}<a class="text-danger" href="{{if $vout.SpentTxID}}/tx/{{$vout.SpentTxID}}{{else}}/spending/{{$tx.Txid}}/{{$vout.N}}{{end}}" title="Spent">➡</a>{{else -}}
