@@ -569,6 +569,12 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
 				} else {
 					d.cbs.balancesHit++
 				}
+				// check for duplicates
+				if i, ok := balance.utxosMap[string(btxID)]; ok {
+					if balance.Utxos[i].Vout == int32(i) {
+						continue
+					}
+				}
 				balance.BalanceSat.Add(&balance.BalanceSat, &output.ValueSat)
 				balance.addUtxo(&Utxo{
 					BtxID:    btxID,
