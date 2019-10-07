@@ -21,6 +21,7 @@ import (
 	"github.com/martinboehm/btcd/wire"
 	"github.com/martinboehm/btcutil"
 	"github.com/martinboehm/btcutil/chaincfg"
+	"github.com/martinboehm/btcutil/txscript"
 )
 
 const (
@@ -285,6 +286,18 @@ func (p *PivXParser) outputScriptToAddresses(script []byte) ([]string, bool, err
 
 	rv, s, _ := p.BitcoinOutputScriptToAddressesFunc(script)
 	return rv, s, nil
+}
+
+// IsAddrDescIndexable returns true if AddressDescriptor should be added to index
+// empty or OP_RETURN scripts are not indexed.
+// also are not indexed: zerocoin mints/spends coinbase txes and coinstake markers
+func (p *PivXParser) IsAddrDescIndexable(addrDesc bchain.AddressDescriptor) bool {
+	if len(addrDesc) == 0 || addrDesc[0] == txscript.OP_RETURN ||
+			isCoinBaseFakeAddr(addrDesc) || isCoinStakeFakeAddr(addrDesc) ||
+			isZeroCoinSpendScript(addrDesc) || isZeroCoinMintScript(addrDesc) {
+		return false
+	}
+	return true
 }
 
 func (p *PivXParser) GetAddrDescForUnknownInput(tx *bchain.Tx, input int) bchain.AddressDescriptor {
