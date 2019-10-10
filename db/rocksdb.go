@@ -424,6 +424,26 @@ func (ab *AddrBalance) ReceivedSat() *big.Int {
 	return &r
 }
 
+// Check if addressBalance has an utxo
+func (ab *AddrBalance) hasUtxo(btxID []byte, vout int32) bool {
+	if len(ab.utxosMap) > 0 {
+		if i, ok := ab.utxosMap[string(btxID)]; ok {
+			if ab.Utxos[i].Vout == vout {
+				return true
+			}
+		}
+		return false;
+	} else {
+		for _, utxo := range ab.Utxos {
+			if (string(utxo.BtxID) == string(btxID)) &&
+						(utxo.Vout == vout) {
+				return true
+			}
+		}
+		return false;
+	}
+}
+
 // addUtxo
 func (ab *AddrBalance) addUtxo(u *Utxo) {
 	ab.Utxos = append(ab.Utxos, *u)
@@ -571,10 +591,8 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
 						d.cbs.balancesHit++
 					}
 					// check for duplicates
-					if i, ok := balance.utxosMap[string(btxID)]; ok {
-						if balance.Utxos[i].Vout == int32(i) {
-							continue
-						}
+					if balance.hasUtxo(btxID, int32(i)) {
+						continue
 					}
 					balance.BalanceSat.Add(&balance.BalanceSat, &output.ValueSat)
 					balance.addUtxo(&Utxo{

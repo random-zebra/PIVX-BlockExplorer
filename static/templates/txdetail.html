@@ -33,7 +33,7 @@
                                 {{- if $vin.Addresses -}}
                                 <span class="tx-amt">
                                   {{formatAmount $vin.ValueSat}} {{$cs}}
-                                  {{- if isP2CS $vin.Addresses -}}
+                                  {{- if and $vin.Txid (isP2CS $vin.Addresses) -}}
                                     <a class="float-left text-muted" href="/tx/{{$vin.Txid}}" title="Outpoint {{$vin.Txid}},{{$vin.Vout}}">➡&nbsp;</a>
                                   {{- end -}}
                                 </span>
