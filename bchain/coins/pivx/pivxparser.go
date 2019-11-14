@@ -118,8 +118,8 @@ func (p *PivXParser) ParseBlock(b []byte) (*bchain.Block, error) {
 		return nil, errors.Annotatef(err, "Deserialize")
 	}
 
-	if h.Version > 3 {
-		// Skip past AccumulatorCheckpoint which was added in pivx block version 4
+	if h.Version > 3 && h.Version < 7 {
+		// Skip past AccumulatorCheckpoint
 		r.Seek(32, io.SeekCurrent)
 	}
 
