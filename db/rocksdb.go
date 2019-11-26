@@ -19,6 +19,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/juju/errors"
 	"github.com/tecbot/gorocksdb"
+	"github.com/martinboehm/btcutil/txscript"
 )
 
 const dbVersion = 5
@@ -423,6 +424,26 @@ func (ab *AddrBalance) ReceivedSat() *big.Int {
 	return &r
 }
 
+// Check if addressBalance has an utxo
+func (ab *AddrBalance) hasUtxo(btxID []byte, vout int32) bool {
+	if len(ab.utxosMap) > 0 {
+		if i, ok := ab.utxosMap[string(btxID)]; ok {
+			if ab.Utxos[i].Vout == vout {
+				return true
+			}
+		}
+		return false;
+	} else {
+		for _, utxo := range ab.Utxos {
+			if (string(utxo.BtxID) == string(btxID)) &&
+						(utxo.Vout == vout) {
+				return true
+			}
+		}
+		return false;
+	}
+}
+
 // addUtxo
 func (ab *AddrBalance) addUtxo(u *Utxo) {
 	ab.Utxos = append(ab.Utxos, *u)
@@ -499,6 +520,21 @@ func (d *RocksDB) GetAndResetConnectBlockStats() string {
 	return s
 }
 
+// PIVX
+const OP_CHECKCOLDSTAKEVERIFY = 0xd1
+
+func isPayToColdStake(signatureScript []byte) bool {
+	return len(signatureScript) > 50 && signatureScript[4] == OP_CHECKCOLDSTAKEVERIFY
+}
+
+func getOwnerFromP2CS(signatureScript []byte) ([]byte, error) {
+	OwnerScript := make([]byte, 20)
+	copy(OwnerScript, signatureScript[28:49])
+	return txscript.NewScriptBuilder().AddOp(txscript.OP_DUP).AddOp(txscript.OP_HASH160).
+							AddData(OwnerScript).AddOp(txscript.OP_EQUALVERIFY).AddOp(txscript.OP_CHECKSIG).Script()
+}
+
+
 func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses addressesMap, txAddressesMap map[string]*TxAddresses, balances map[string]*AddrBalance) error {
 	blockTxIDs := make([][]byte, len(block.Txs))
 	blockTxAddresses := make([]*TxAddresses, len(block.Txs))
@@ -530,32 +566,45 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
 				continue
 			}
 			tao.AddrDesc = addrDesc
-			if d.chainParser.IsAddrDescIndexable(addrDesc) {
-				strAddrDesc := string(addrDesc)
-				balance, e := balances[strAddrDesc]
-				if !e {
-					balance, err = d.GetAddrDescBalance(addrDesc, addressBalanceDetailUTXOIndexed)
-					if err != nil {
-						return err
-					}
-					if balance == nil {
-						balance = &AddrBalance{}
-					}
-					balances[strAddrDesc] = balance
-					d.cbs.balancesMiss++
-				} else {
-					d.cbs.balancesHit++
+			vOutputAddrDescriptors := []bchain.AddressDescriptor{addrDesc}
+			if isPayToColdStake(addrDesc) {
+				ownerDesc, e := getOwnerFromP2CS(addrDesc)
+				if e == nil {
+					vOutputAddrDescriptors = append(vOutputAddrDescriptors, ownerDesc)
 				}
-				balance.BalanceSat.Add(&balance.BalanceSat, &output.ValueSat)
-				balance.addUtxo(&Utxo{
-					BtxID:    btxID,
-					Vout:     int32(i),
-					Height:   block.Height,
-					ValueSat: output.ValueSat,
-				})
-				counted := addToAddressesMap(addresses, strAddrDesc, btxID, int32(i))
-				if !counted {
-					balance.Txs++
+			}
+			for _, oad := range vOutputAddrDescriptors {
+				if d.chainParser.IsAddrDescIndexable(oad) {
+					strAddrDesc := string(oad)
+					balance, e := balances[strAddrDesc]
+					if !e {
+						balance, err = d.GetAddrDescBalance(oad, addressBalanceDetailUTXOIndexed)
+						if err != nil {
+							return err
+						}
+						if balance == nil {
+							balance = &AddrBalance{}
+						}
+						balances[strAddrDesc] = balance
+						d.cbs.balancesMiss++
+					} else {
+						d.cbs.balancesHit++
+					}
+					// check for duplicates
+					if balance.hasUtxo(btxID, int32(i)) {
+						continue
+					}
+					balance.BalanceSat.Add(&balance.BalanceSat, &output.ValueSat)
+					balance.addUtxo(&Utxo{
+						BtxID:    btxID,
+						Vout:     int32(i),
+						Height:   block.Height,
+						ValueSat: output.ValueSat,
+					})
+					counted := addToAddressesMap(addresses, strAddrDesc, btxID, int32(i))
+					if !counted {
+						balance.Txs++
+					}
 				}
 			}
 		}
@@ -614,32 +663,41 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
 				}
 				continue
 			}
-			if d.chainParser.IsAddrDescIndexable(spentOutput.AddrDesc) {
-				strAddrDesc := string(spentOutput.AddrDesc)
-				balance, e := balances[strAddrDesc]
-				if !e {
-					balance, err = d.GetAddrDescBalance(spentOutput.AddrDesc, addressBalanceDetailUTXOIndexed)
-					if err != nil {
-						return err
+			vOutputAddrDescriptors := []bchain.AddressDescriptor{spentOutput.AddrDesc}
+			if isPayToColdStake(spentOutput.AddrDesc) {
+				ownerDesc, e := getOwnerFromP2CS(spentOutput.AddrDesc)
+				if e == nil {
+					vOutputAddrDescriptors = append(vOutputAddrDescriptors, ownerDesc)
+				}
+			}
+			for _, soad := range vOutputAddrDescriptors {
+				if d.chainParser.IsAddrDescIndexable(soad) {
+					strAddrDesc := string(soad)
+					balance, e := balances[strAddrDesc]
+					if !e {
+						balance, err = d.GetAddrDescBalance(soad, addressBalanceDetailUTXOIndexed)
+						if err != nil {
+							return err
+						}
+						if balance == nil {
+							balance = &AddrBalance{}
+						}
+						balances[strAddrDesc] = balance
+						d.cbs.balancesMiss++
+					} else {
+						d.cbs.balancesHit++
 					}
-					if balance == nil {
-						balance = &AddrBalance{}
+					counted := addToAddressesMap(addresses, strAddrDesc, spendingTxid, ^int32(i))
+					if !counted {
+						balance.Txs++
 					}
-					balances[strAddrDesc] = balance
-					d.cbs.balancesMiss++
-				} else {
-					d.cbs.balancesHit++
+					balance.BalanceSat.Sub(&balance.BalanceSat, &spentOutput.ValueSat)
+					balance.markUtxoAsSpent(btxID, int32(input.Vout))
+					if balance.BalanceSat.Sign() < 0 {
+						d.resetValueSatToZero(&balance.BalanceSat, soad, "balance")
+					}
+					balance.SentSat.Add(&balance.SentSat, &spentOutput.ValueSat)
 				}
-				counted := addToAddressesMap(addresses, strAddrDesc, spendingTxid, ^int32(i))
-				if !counted {
-					balance.Txs++
-				}
-				balance.BalanceSat.Sub(&balance.BalanceSat, &spentOutput.ValueSat)
-				balance.markUtxoAsSpent(btxID, int32(input.Vout))
-				if balance.BalanceSat.Sign() < 0 {
-					d.resetValueSatToZero(&balance.BalanceSat, spentOutput.AddrDesc, "balance")
-				}
-				balance.SentSat.Add(&balance.SentSat, &spentOutput.ValueSat)
 			}
 		}
 	}

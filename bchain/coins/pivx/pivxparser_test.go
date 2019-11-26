@@ -62,6 +62,23 @@ func Test_GetAddressesFromAddrDesc(t *testing.T) {
 	type args struct {
 		script string
 	}
+
+	tnet_tests := []struct {
+		name    string
+		args    args
+		want    []string
+		want2   bool
+		wantErr bool
+	}{
+		{
+			name:    "P2CS",
+			args:    args{script: "76a97b63d11451ca6fc16e1d0cbbaab0cb730108889a02b24aea671430326a580c016efc9c62b8396bd10be4db656cb56888ac"},
+			want:    []string{"WW8W81Ak63PxqTmr6G2LfrDkBB752Vh792", "y1NghE51msrjsPb8HtKYy3DoxY4RdyAg4e"},
+			want2:   true,
+			wantErr: false,
+		},
+	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -105,6 +122,25 @@ func Test_GetAddressesFromAddrDesc(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			b, _ := hex.DecodeString(tt.args.script)
 			got, got2, err := parser.GetAddressesFromAddrDesc(b)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetAddressesFromAddrDesc() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetAddressesFromAddrDesc() = %v, want %v", got, tt.want)
+			}
+			if !reflect.DeepEqual(got2, tt.want2) {
+				t.Errorf("GetAddressesFromAddrDesc() = %v, want %v", got2, tt.want2)
+			}
+		})
+	}
+
+	tnet_parser := NewPivXParser(GetChainParams("test"), &btc.Configuration{})
+
+	for _, tt := range tnet_tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, _ := hex.DecodeString(tt.args.script)
+			got, got2, err := tnet_parser.GetAddressesFromAddrDesc(b)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetAddressesFromAddrDesc() error = %v, wantErr %v", err, tt.wantErr)
 				return

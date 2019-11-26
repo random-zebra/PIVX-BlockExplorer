@@ -429,9 +429,9 @@ type TemplateData struct {
 	SendTxHex            string
 	Status               string
 	NonZeroBalanceTokens bool
-    IsIndex              bool
-    IsCharts             bool
-    ChartData            string
+	IsIndex              bool
+  	IsCharts             bool
+  	ChartData            string
 }
 
 func (s *PublicServer) parseTemplates() []*template.Template {
@@ -447,6 +447,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
         "getPercent":               getPercent,
         "formatAmount0":            formatAmount0,
         "formatDenom":              formatDenom,
+        "isP2CS":					isP2CS,
 	}
 	var createTemplate func(filenames ...string) *template.Template
 	if s.debug {
@@ -1219,7 +1220,6 @@ func formatAmount0(a json.Number) string {
     return fmt.Sprintf("%.0f", val)
 }
 
-
 // getPercent returns the float to 2 decimal places and appends %
 func getPercent(a json.Number, b json.Number) string {
     x, _ := a.Float64()
@@ -1228,10 +1228,18 @@ func getPercent(a json.Number, b json.Number) string {
     return fmt.Sprintf("%.2f%%", percent)
 }
 
-
 // returns the amount of tokens on a given zerocoin denom
 func formatDenom(supply json.Number, den int) string {
     val, _ := supply.Float64()
     coins := val / float64(den)
     return fmt.Sprintf("%.0f", coins)
+}
+
+// returns true if scriptPubKey is P2CS
+func isP2CS(addrs []string) bool {
+	if len(addrs) != 2 {
+		return false
+	}
+	// staker and owner address have different base58 prefix
+	return string(addrs[0][0]) != string(addrs[1][0])
 }
