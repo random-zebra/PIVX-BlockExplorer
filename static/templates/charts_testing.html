@@ -1,0 +1,13 @@
+{{define "specific" -}}{{$data := .ChartData}}
+<h1>Testing Stuff</h1>
+
+<h3>Double Masternode payments</h3>
+<p>Total number of double payments for masternodes and relative frequency.</p>
+{{template "canvas_blockrange" "canv_testing_01"}}
+<br>
+
+<script type="text/javascript">
+    testing_data_Json = {{$data}}
+</script>
+<script src="../static/js/charts_testing.js"></script>
+{{- end -}}

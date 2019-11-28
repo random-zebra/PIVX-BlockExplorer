@@ -145,6 +145,7 @@ func (s *PublicServer) ConnectFullPublicInterface() {
 		serveMux.HandleFunc(path+"mempool", s.htmlTemplateHandler(s.explorerMempool))
         serveMux.HandleFunc(path+"charts/supply", s.htmlTemplateHandler(s.explorerChartsSupply))
         serveMux.HandleFunc(path+"charts/network", s.htmlTemplateHandler(s.explorerChartsNetwork))
+				serveMux.HandleFunc(path+"charts/testing", s.htmlTemplateHandler(s.explorerChartsTesting))
         serveMux.HandleFunc(path+"charts/github", s.htmlTemplateHandler(s.explorerChartsGithub))
 	} else {
 		// redirect to wallet requests for tx and address, possibly to external site
@@ -400,6 +401,7 @@ const (
 	mempoolTpl
     chartsSupplyTpl
     chartsNetworkTpl
+		chartsTestingTpl
     chartsGithubTpl
 
 	tplCount
@@ -496,6 +498,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
 	t[sendTransactionTpl] = createTemplate("./static/templates/sendtx.html", "./static/templates/base.html")
     t[chartsSupplyTpl] = createTemplate("./static/templates/charts_supply.html", "./static/templates/charts_canvas_blockrange.html", "./static/templates/base.html")
     t[chartsNetworkTpl] = createTemplate("./static/templates/charts_network.html", "./static/templates/charts_canvas_blockrange.html", "./static/templates/base.html")
+		t[chartsTestingTpl] = createTemplate("./static/templates/charts_testing.html", "./static/templates/charts_canvas_blockrange.html", "./static/templates/base.html")
     t[chartsGithubTpl] = createTemplate("./static/templates/charts_github.html", "./static/templates/base.html")
 	if s.chainParser.GetChainType() == bchain.ChainEthereumType {
 		t[txTpl] = createTemplate("./static/templates/tx.html", "./static/templates/txdetail_ethereumtype.html", "./static/templates/base.html")
@@ -891,6 +894,19 @@ func (s *PublicServer) explorerChartsNetwork(w http.ResponseWriter, r *http.Requ
     data.IsCharts = true
     data.ChartData = string(jsonFile)
 	return chartsNetworkTpl, data, nil
+}
+
+func (s *PublicServer) explorerChartsTesting(w http.ResponseWriter, r *http.Request) (tpl, *TemplateData, error) {
+	data := s.newTemplateData()
+    absPath, _ := filepath.Abs("../plot_data/mn_data.json")
+    jsonFile, err := ioutil.ReadFile(absPath)
+    // Load data from json
+    if err != nil {
+        return errorTpl, nil, err
+    }
+    data.IsCharts = true
+    data.ChartData = string(jsonFile)
+	return chartsTestingTpl, data, nil
 }
 
 func (s *PublicServer) explorerChartsGithub(w http.ResponseWriter, r *http.Request) (tpl, *TemplateData, error) {

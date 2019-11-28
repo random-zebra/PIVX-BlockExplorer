@@ -107,16 +107,16 @@ function AmountToDecimal(amount, precision) {
 }
 
 // returns time range for form-value range
-function GetTimeRange(range) {
+function GetTimeRange(range, step) {
     switch (range) {
         case "last_year":
-            return STEPS_YEAR;
+            return Math.round(STEPS_YEAR * (100/step));
         case "last_month":
-            return STEPS_MONTH;
+            return Math.round(STEPS_MONTH * (100/step));
         case "last_week":
-            return STEPS_WEEK;
+            return Math.round(STEPS_WEEK * (100/step));
         case "last_day":
-            return STEPS_DAY;
+            return Math.round(STEPS_DAY * (100/step));
         default:
             return 0;
     }
@@ -247,32 +247,36 @@ function onRangeSelectChanged(sel_id) {
 }
 
 function SetChartRange(canv_id, range) {
+    let step = 100;
+    if (canv_id == "canv_testing_01") {
+      step = 1;
+    }
+    const total_len = Math.round((LAST_BLOCK_NUM + 1)/step);
     HideCanvas(canv_id);
     let val_from, val_to;
 
     if (range) {
-        const timeRange = GetTimeRange(range);
-        const total_len = block_data.blocks_axis.length;
+        const timeRange = GetTimeRange(range, step);
         val_from = total_len - timeRange;
+        val_to = total_len - 1;
         // timeRange = 0 is used for whole dataset
         if (timeRange == 0) {
             val_from = 0;
         }
-        val_to = block_data.blocks_axis.length - 1;
     } else {
         // custom range
         val_from = document.getElementById(canv_id + "_from").value;
         val_to = document.getElementById(canv_id + "_to").value;
-        val_from = Math.round(val_from/100)-1;
-        val_to = Math.round(val_to/100)-1;
+        val_from = Math.round(val_from/step)-1;
+        val_to = Math.round(val_to/step)-1;
     }
 
-    if (val_to >= block_data.blocks_axis.length) {
-        val_to = block_data.blocks_axis.length - 1;
+    if (val_to >= total_len) {
+        val_to = total_len - 1;
     }
 
     if (val_from >= val_to) {
-        alert("Invalid range. Last block number must be greater than first block number + 100");
+        alert("Invalid range. Last block number must be greater than first block number (+ 100)");
         return;
     }
 

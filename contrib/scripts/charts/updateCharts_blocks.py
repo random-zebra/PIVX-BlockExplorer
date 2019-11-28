@@ -26,34 +26,12 @@ bb_url += ".pivx.link"
 supply_data_file = os.path.join("/opt/coins/blockbook/plot_data", "supply_data.json")
 network_data_file = os.path.join("/opt/coins/blockbook/plot_data", "network_data.json")
 
-# --------------------------------------------------
-class ApiClient:
-
-    def __init__(self):
-        self.url = bb_url
-
-    def checkResponse(self, method, param=""):
-        url = self.url + "/api/v2/%s" % method
-        if param != "":
-            url += "/%s" % param
-        resp = requests.get(url, data={}, verify=True)
-        if resp.status_code == 200:
-            data = resp.json()
-            return data
-        raise Exception("Invalid response")
-
-    def getTx(self, tx_hash):
-        return self.checkResponse("tx", tx_hash)
-
-
-# --------------------------------------------------
 # Constants
-
 ZC_DENOMS = [1, 5, 10, 50, 100, 500, 1000, 5000]
 
 # --------------------------------------------------
 
-# Initialize RPC connection and API client
+# Initialize RPC connection
 httpConnection = httplib.HTTPConnection(rpc_host, rpc_port, timeout=20)
 conn = AuthServiceProxy(rpc_url, timeout=1000, connection=httpConnection)
 
