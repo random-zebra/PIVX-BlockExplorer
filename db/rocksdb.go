@@ -1251,82 +1251,100 @@ func (d *RocksDB) disconnectTxAddresses(wb *gorocksdb.WriteBatch, height uint32,
 		return b, nil
 	}
 	for i, t := range txa.Inputs {
-		if len(t.AddrDesc) > 0 {
-			input := &inputs[i]
-			s := string(t.AddrDesc)
-			_, exist := addresses[s]
-			if !exist {
-				addresses[s] = struct{}{}
+		vInputAddrDescriptors := []bchain.AddressDescriptor{t.AddrDesc}
+		if isPayToColdStake(t.AddrDesc) {
+			ownerDesc, e := getOwnerFromP2CS(t.AddrDesc)
+			if e == nil {
+				vInputAddrDescriptors = append(vInputAddrDescriptors, ownerDesc)
 			}
-			s = string(input.btxID)
-			sa, found := txAddressesToUpdate[s]
-			if !found {
-				sa, err = d.getTxAddresses(input.btxID)
-				if err != nil {
-					return err
+		}
+		for _, ad := range vInputAddrDescriptors {
+			if len(ad) > 0 {
+				input := &inputs[i]
+				s := string(ad)
+				_, exist := addresses[s]
+				if !exist {
+					addresses[s] = struct{}{}
 				}
+				s = string(input.btxID)
+				sa, found := txAddressesToUpdate[s]
+				if !found {
+					sa, err = d.getTxAddresses(input.btxID)
+					if err != nil {
+						return err
+					}
+					if sa != nil {
+						txAddressesToUpdate[s] = sa
+					}
+				}
+				var inputHeight uint32
 				if sa != nil {
-					txAddressesToUpdate[s] = sa
+					sa.Outputs[input.index].Spent = false
+					inputHeight = sa.Height
 				}
-			}
-			var inputHeight uint32
-			if sa != nil {
-				sa.Outputs[input.index].Spent = false
-				inputHeight = sa.Height
-			}
-			if d.chainParser.IsAddrDescIndexable(t.AddrDesc) {
-				balance, err = getAddressBalance(t.AddrDesc)
-				if err != nil {
-					return err
-				}
-				if balance != nil {
-					// subtract number of txs only once
-					if !exist {
-						balance.Txs--
+				if d.chainParser.IsAddrDescIndexable(ad) {
+					balance, err = getAddressBalance(ad)
+					if err != nil {
+						return err
 					}
-					balance.SentSat.Sub(&balance.SentSat, &t.ValueSat)
-					if balance.SentSat.Sign() < 0 {
-						d.resetValueSatToZero(&balance.SentSat, t.AddrDesc, "sent amount")
+					if balance != nil {
+						// subtract number of txs only once
+						if !exist {
+							balance.Txs--
+						}
+						balance.SentSat.Sub(&balance.SentSat, &t.ValueSat)
+						if balance.SentSat.Sign() < 0 {
+							d.resetValueSatToZero(&balance.SentSat, ad, "sent amount")
+						}
+						balance.BalanceSat.Add(&balance.BalanceSat, &t.ValueSat)
+						balance.Utxos = append(balance.Utxos, Utxo{
+							BtxID:    input.btxID,
+							Vout:     input.index,
+							Height:   inputHeight,
+							ValueSat: t.ValueSat,
+						})
+					} else {
+						ad, _, _ := d.chainParser.GetAddressesFromAddrDesc(ad)
+						glog.Warningf("Balance for address %s (%s) not found", ad, ad)
 					}
-					balance.BalanceSat.Add(&balance.BalanceSat, &t.ValueSat)
-					balance.Utxos = append(balance.Utxos, Utxo{
-						BtxID:    input.btxID,
-						Vout:     input.index,
-						Height:   inputHeight,
-						ValueSat: t.ValueSat,
-					})
-				} else {
-					ad, _, _ := d.chainParser.GetAddressesFromAddrDesc(t.AddrDesc)
-					glog.Warningf("Balance for address %s (%s) not found", ad, t.AddrDesc)
 				}
 			}
 		}
 	}
 	for i, t := range txa.Outputs {
-		if len(t.AddrDesc) > 0 {
-			s := string(t.AddrDesc)
-			_, exist := addresses[s]
-			if !exist {
-				addresses[s] = struct{}{}
+		vOutputAddrDescriptors := []bchain.AddressDescriptor{t.AddrDesc}
+		if isPayToColdStake(t.AddrDesc) {
+			ownerDesc, e := getOwnerFromP2CS(t.AddrDesc)
+			if e == nil {
+				vOutputAddrDescriptors = append(vOutputAddrDescriptors, ownerDesc)
 			}
-			if d.chainParser.IsAddrDescIndexable(t.AddrDesc) {
-				balance, err := getAddressBalance(t.AddrDesc)
-				if err != nil {
-					return err
+		}
+		for _, ad := range vOutputAddrDescriptors {
+			if len(ad) > 0 {
+				s := string(ad)
+				_, exist := addresses[s]
+				if !exist {
+					addresses[s] = struct{}{}
 				}
-				if balance != nil {
-					// subtract number of txs only once
-					if !exist {
-						balance.Txs--
+				if d.chainParser.IsAddrDescIndexable(ad) {
+					balance, err := getAddressBalance(ad)
+					if err != nil {
+						return err
 					}
-					balance.BalanceSat.Sub(&balance.BalanceSat, &t.ValueSat)
-					if balance.BalanceSat.Sign() < 0 {
-						d.resetValueSatToZero(&balance.BalanceSat, t.AddrDesc, "balance")
+					if balance != nil {
+						// subtract number of txs only once
+						if !exist {
+							balance.Txs--
+						}
+						balance.BalanceSat.Sub(&balance.BalanceSat, &t.ValueSat)
+						if balance.BalanceSat.Sign() < 0 {
+							d.resetValueSatToZero(&balance.BalanceSat, ad, "balance")
+						}
+						balance.markUtxoAsSpent(btxID, int32(i))
+					} else {
+						ad, _, _ := d.chainParser.GetAddressesFromAddrDesc(ad)
+						glog.Warningf("Balance for address %s (%s) not found", ad, ad)
 					}
-					balance.markUtxoAsSpent(btxID, int32(i))
-				} else {
-					ad, _, _ := d.chainParser.GetAddressesFromAddrDesc(t.AddrDesc)
-					glog.Warningf("Balance for address %s (%s) not found", ad, t.AddrDesc)
 				}
 			}
 		}
