@@ -33,6 +33,7 @@ const (
 	OP_ZEROCOINMINT  = 0xc1
 	OP_ZEROCOINSPEND  = 0xc2
 	OP_CHECKCOLDSTAKEVERIFY = 0xd1
+	OP_STAKEMODIFIER = 0xd2
 
     // Labels
     ZCMINT_LABEL = "Zerocoin Mint"
@@ -281,7 +282,10 @@ func (p *PivXParser) outputScriptToAddresses(script []byte) ([]string, bool, err
         return []string{CSTAKE_LABEL}, false, nil
     }
     if isP2CSScript(script) {
-    	return p.P2CSScriptToAddress(script)
+        return p.P2CSScriptToAddress(script)
+    }
+    if isStakeModifierSig(script) {
+        return p.TryParseStakeModifierSig(script)
     }
 
 	rv, s, _ := p.BitcoinOutputScriptToAddressesFunc(script)
@@ -294,7 +298,8 @@ func (p *PivXParser) outputScriptToAddresses(script []byte) ([]string, bool, err
 func (p *PivXParser) IsAddrDescIndexable(addrDesc bchain.AddressDescriptor) bool {
 	if len(addrDesc) == 0 || addrDesc[0] == txscript.OP_RETURN ||
 			isCoinBaseFakeAddr(addrDesc) || isCoinStakeFakeAddr(addrDesc) ||
-			isZeroCoinSpendScript(addrDesc) || isZeroCoinMintScript(addrDesc) {
+			isZeroCoinSpendScript(addrDesc) || isZeroCoinMintScript(addrDesc) ||
+			isStakeModifierSig(addrDesc) {
 		return false
 	}
 	return true
@@ -375,6 +380,11 @@ func isCoinStakeFakeAddr(signatureScript []byte) bool {
 	return len(signatureScript) == 1 && signatureScript[0] == CSTAKE_ADDR_INT
 }
 
+// Checks if script is a coinstake modifier signature
+func isStakeModifierSig(signatureScript []byte) bool {
+	return len(signatureScript) > 0 && signatureScript[0] == OP_STAKEMODIFIER
+}
+
 // Checks if a Tx is coinbase
 func isCoinbaseTx(tx bchain.Tx) bool {
     return len(tx.Vin) == 1 && tx.Vin[0].Coinbase != "" && tx.Vin[0].Sequence == math.MaxUint32
@@ -409,4 +419,28 @@ func (p *PivXParser) P2CSScriptToAddress(script []byte) ([]string, bool, error) 
 	rv[1] = OwnerAddr.EncodeAddress()
 
 	return rv, true, nil
+}
+
+// Parses Stake Modifier signature (OP_STAKEMODIFIER <datalen> <sig>)
+func (p *PivXParser) TryParseStakeModifierSig(script []byte) ([]string, bool, error) {
+	if len(script) > 2 {
+		var l int = int(script[1])
+		var data []byte = script[2:]
+
+		var ed string;
+		isASCII := true
+		for _, c := range data {
+			if c < 32 || c > 127 {
+				isASCII = false
+				break
+			}
+		}
+		if isASCII {
+			ed = "(" + string(data) + ")"
+		} else {
+			ed = hex.EncodeToString(data)
+		}
+		return []string{"Modifier Sig " + ed}, true, nil
+	}
+	return []string{""}, true, nil
 }
