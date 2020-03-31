@@ -424,9 +424,7 @@ func (p *PivXParser) P2CSScriptToAddress(script []byte) ([]string, bool, error) 
 // Parses Stake Modifier signature (OP_STAKEMODIFIER <datalen> <sig>)
 func (p *PivXParser) TryParseStakeModifierSig(script []byte) ([]string, bool, error) {
 	if len(script) > 2 {
-		var l int = int(script[1])
 		var data []byte = script[2:]
-
 		var ed string;
 		isASCII := true
 		for _, c := range data {
