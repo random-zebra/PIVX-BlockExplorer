@@ -72,11 +72,9 @@ except FileNotFoundError:
     if isTestnet:
         supply_data["time_axis"] = [1454124731, 1488951557]
         supply_data["lastBlockHash"] = '0000041e482b9b9691d98eefb48473405c0b8ec31b76df3797c74a78680ef818'
-        supply_data["pivSupply"] = [0.0, 24810000.99975790]
     else:
         supply_data["time_axis"] = [1454124731, 1454186818]
         supply_data["lastBlockHash"] = '0000000a86f23294329c83d69e254a4f8d127b6b899a14b147885740c4be1713'
-        supply_data["pivSupply"] = [0.0, 84751.0]
     zpivSupply = {}
     zpivMints = {}
     for k in ZC_DENOMS:
@@ -117,7 +115,7 @@ if (
     for data_key in ["zpivSupply", "zpivMints"]:
         for denom_key in supply_data[data_key]:
             supply_data[data_key][denom_key] = supply_data[data_key][denom_key][:-3]
-    for data_key in ["blocks_axis", "time_axis", "pivSupply"]:
+    for data_key in ["blocks_axis", "time_axis"]:
         supply_data[data_key] = supply_data[data_key][:-3]
 
     for data_key in network_data:
@@ -134,11 +132,6 @@ while supply_data["blocks_axis"][-1] + 100 <= blockCount:
     print("Getting block %d..." % new_block_num)
     block = conn.getblock(supply_data["lastBlockHash"], True)
 
-    # get PIV supply and zPIV supply
-    supply_data["pivSupply"].append(float(block["moneysupply"]))
-    for k in ZC_DENOMS:
-        supply_data["zpivSupply"]["denom_%d" % k].append(int(block["zPIVsupply"][str(k)]))
-
     # get time, blocktime, blocksize and difficulty
     supply_data["time_axis"].append(int(block["time"]))
     network_data["time_axis"].append(int(block["time"]))
@@ -146,13 +139,20 @@ while supply_data["blocks_axis"][-1] + 100 <= blockCount:
     network_data["blocktime"].append((network_data["time_axis"][-1]-network_data["time_axis"][-2])/100)
     network_data["blocksize"].append(int(block["size"]))
 
+
     # fetch blockindexstats over 100 blocks: [N, N+99]
     block_stats = conn.getblockindexstats(new_block_num-100, 100)
 
-    # get mints
+    # get mints - zpiv supply
+    spends = {}
     for k in ZC_DENOMS:
         # get mints in range
         supply_data["zpivMints"]["denom_%d" % k].append(int(block_stats["mintcount"]["denom_%d" % k]))
+        # get spends in range
+        spends["denom_%d" % k] = int(block_stats["spendcount"]["denom_%d" % k]) + int(block_stats["publicspendcount"]["denom_%d" % k])
+        # calculate supply
+        new_zpiv_supply = (supply_data["zpivMints"]["denom_%d" % k][-1] - spends["denom_%d" % k]) * k
+        supply_data["zpivSupply"]["denom_%d" % k].append(supply_data["zpivSupply"]["denom_%d" % k][-1] + new_zpiv_supply)
 
     # get tx count and fees
     network_data["txs"].append(int(block_stats["txcount_all"]))
