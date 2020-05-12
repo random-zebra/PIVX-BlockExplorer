@@ -129,8 +129,8 @@ while supply_data["blocks_axis"][-1] + 100 <= blockCount:
     # get mints - zpiv supply
     spends = {}
     for k in ZC_DENOMS:
-        # get mints in range
-        supply_data["zpivMints"]["denom_%d" % k].append(int(block_stats["mintcount"]["denom_%d" % k]))
+        # mints always zero after cache
+        supply_data["zpivMints"]["denom_%d" % k].append(0)
         # get spends in range
         spends["denom_%d" % k] = int(block_stats["spendcount"]["denom_%d" % k]) + int(block_stats["publicspendcount"]["denom_%d" % k])
         # calculate supply
