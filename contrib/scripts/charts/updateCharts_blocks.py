@@ -66,45 +66,26 @@ try:
         network_data = json.load(f)
 
 except FileNotFoundError:
-    # first run (blocks 0-99 and 100-199 hardcoded)
-    supply_data = {}
-    supply_data["blocks_axis"] = [0, 100]
+    # first run (hardcoded)
     if isTestnet:
-        supply_data["time_axis"] = [1454124731, 1488951557]
-        supply_data["lastBlockHash"] = '0000041e482b9b9691d98eefb48473405c0b8ec31b76df3797c74a78680ef818'
-        supply_data["pivSupply"] = [0.0, 24810000.99975790]
+        supply_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "supply_old-testnet.json")
+        network_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "network_old-testnet.json")
     else:
-        supply_data["time_axis"] = [1454124731, 1454186818]
-        supply_data["lastBlockHash"] = '0000000a86f23294329c83d69e254a4f8d127b6b899a14b147885740c4be1713'
-        supply_data["pivSupply"] = [0.0, 84751.0]
-    zpivSupply = {}
-    zpivMints = {}
-    for k in ZC_DENOMS:
-        denom_key = "denom_%d" % k
-        zpivSupply[denom_key] = [0, 0]
-        zpivMints[denom_key] = [0, 0]
-    supply_data["zpivSupply"] = zpivSupply
-    supply_data["zpivMints"] = zpivMints
+        supply_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "supply_old.json")
+        network_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "network_old.json")
+    try:
+        with open(supply_data_file_cache, 'r') as f:
+            supply_data = json.load(f)
 
-    network_data = {}
-    network_data["blocks_axis"] = [0, 100]
-    if isTestnet:
-        network_data["time_axis"] = [1454124731, 1488951557]
-        network_data["txs"] = [0, 107]
-        network_data["fees_ttl"] = [0, 0.0003067]
-        network_data["fees_perKb"] = [0, 0.00012864]
-        network_data["blocksize"] = [0, 214]
-        network_data["blocktime"] = [0, (1488951557-1454124731)/100]
-        network_data["difficulty"] = [0.00, 0.00]
-    else:
-        network_data["time_axis"] = [1454124731, 1454186818]
-        network_data["txs"] = [0, 100]
-        network_data["fees_ttl"] = [0, 0.0027982]
-        network_data["fees_perKb"] = [0, 0.00011946]
-        network_data["blocksize"] = [0, 196]
-        network_data["blocktime"] = [0, (1454186818-1454124731)/100]
-        network_data["difficulty"] = [0.00, 0.09]
+        with open(network_data_file_cache, 'r') as f:
+            network_data = json.load(f)
 
+    except FileNotFoundError as e:
+        print("No cache files found. Closing")
+        raise e
+    # delete cache
+    os.remove(supply_data_file_cache)
+    os.remove(network_data_file_cache)
 
 # Check if a reorg occurred
 last_block_hash = conn.getblockhash(supply_data["blocks_axis"][-1])
