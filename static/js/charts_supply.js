@@ -11,7 +11,6 @@ const DENOM_VALUES = {
     denom_5000: 5000,
 };
 // styling
-const PIVX_COLOR = 'rgba(102, 0, 153, 0.7)';
 const DENOM_COLORS = {
     total: 'rgba(55, 47, 68, 0.7)',
     denom_1: 'rgba(255, 255, 51, 0.7)',
@@ -40,7 +39,6 @@ const SPEND_COLOR = ['rgba(0, 0, 255, 0.8)', 'rgba(0, 0, 255, 0.3)'];
 // blocks data
 const block_data = JSON.parse(supply_data_Json);
 const LAST_BLOCK_NUM = block_data.blocks_axis[block_data.blocks_axis.length-1];
-const pivsupplydata = block_data.pivSupply;
 const zpivsupplydata = block_data.zpivSupply;
 const mintsupplydata = block_data.zpivMints;
 let spendsupplydata = {};
@@ -84,7 +82,6 @@ function GetSupplyDataPoints(bl_from, bl_to, denom_key) {
     var rangeObj = {
         blocks_axis: [],
         time_axis: [],
-        pivSupply: [],
         zpivSupply: {},
         zpivMints: {},
         zpivSpends: {}
@@ -142,7 +139,6 @@ function GetSupplyDataPoints(bl_from, bl_to, denom_key) {
             // add data to rangeObj
             rangeObj.blocks_axis.push(block_data.blocks_axis[i]);
             rangeObj.time_axis.push(new Date(block_data.time_axis[i]*1000).toLocaleString());
-            rangeObj.pivSupply.push(block_data.pivSupply[i]);
             if (denom_key == "total") {
                 for (const d_key of DENOM_KEYS) {
                     rangeObj.zpivSupply[d_key].push(zpivsupplydata[d_key][i]);
@@ -183,12 +179,11 @@ function SetSupplyChartRange(val_from, val_to, denom_key) {
         supplyChart[denom_key].data.datasets[1].data = rangeObj.zpivMints[denom_key];
         supplyChart[denom_key].data.datasets[2].data = rangeObj.zpivSpends[denom_key];
     } else {
-        supplyChart[denom_key].data.datasets[0].data = rangeObj.pivSupply;
-        supplyChart[denom_key].data.datasets[1].data = rangeObj.zpivSupply[denom_key];
-        supplyChart[denom_key].data.datasets[2].data = rangeObj.zpivMints[denom_key];
-        supplyChart[denom_key].data.datasets[3].data = rangeObj.zpivSpends[denom_key];
+        supplyChart[denom_key].data.datasets[0].data = rangeObj.zpivSupply[denom_key];
+        supplyChart[denom_key].data.datasets[1].data = rangeObj.zpivMints[denom_key];
+        supplyChart[denom_key].data.datasets[2].data = rangeObj.zpivSpends[denom_key];
         for (let i = 0; i < DENOM_KEYS.length; i++) {
-            supplyChart[denom_key].data.datasets[4+i].data = rangeObj.zpivSupply[DENOM_KEYS[i]];
+            supplyChart[denom_key].data.datasets[3+i].data = rangeObj.zpivSupply[DENOM_KEYS[i]];
         }
     }
     // draw chart
@@ -310,16 +305,7 @@ function InitSupplyChart(denom_key) {
     supplyChart[denom_key].options.onResize = (chart, size) => MinimizeChartLegend(chart, size, 350);
 
     if (denom_key == "total") {
-        supplyChart[denom_key].data.datasets = [{
-            data: [],
-            label: "PIV supply",
-            borderColor: PIVX_COLOR,
-            pointRadius: 2,
-            needsRadius: 2,   // for resize,
-            fill: false,
-            type: 'line',
-            yAxisID: 'axis0'
-        }].concat(
+        supplyChart[denom_key].data.datasets = [].concat(
             supplyChart[denom_key].data.datasets,
             DENOM_KEYS.map((x, index) => (
                 {
