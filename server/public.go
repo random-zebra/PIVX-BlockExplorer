@@ -1240,6 +1240,8 @@ func isP2CS(addrs []string) bool {
 	if len(addrs) != 2 {
 		return false
 	}
-	// staker and owner address have different base58 prefix
-	return string(addrs[0][0]) != string(addrs[1][0])
+	// dirty hack (to remove multisig false positives)
+	// !TODO: implement flag in Vin and Vout objects
+	return (len(addrs[0]) > 0 &&
+				 (addrs[0][0:1] == "S" || addrs[0][0:1] == "W"))
 }

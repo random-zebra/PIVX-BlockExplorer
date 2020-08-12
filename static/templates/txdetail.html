@@ -19,8 +19,8 @@
                                     <span class="ellipsis tx-addr"><span class="tx-descr">Staker:</span> {{index $vin.Addresses 0}}</span>
                                     <span class="ellipsis tx-addr"><span class="tx-descr">Owner:</span> <a href="/address/{{index $vin.Addresses 1}}">{{index $vin.Addresses 1}}</a></span>
                                 {{- else -}}
-                                {{- if $vin.Txid -}}
-                                <a class="float-left text-muted" href="/tx/{{$vin.Txid}}" title="Outpoint {{$vin.Txid}},{{$vin.Vout}}">➡&nbsp;</a>
+                                {{- if gt (len $vin.Addresses) 1 -}}
+                                    <span class="tx-amt tx-descr">Multisig</span>
                                 {{- end -}}
                                 {{- range $a := $vin.Addresses -}}
                                 <span class="ellipsis tx-addr">
@@ -33,7 +33,7 @@
                                 {{- if $vin.Addresses -}}
                                 <span class="tx-amt">
                                   {{formatAmount $vin.ValueSat}} {{$cs}}
-                                  {{- if and $vin.Txid (isP2CS $vin.Addresses) -}}
+                                  {{- if $vin.Txid -}}
                                     <a class="float-left text-muted" href="/tx/{{$vin.Txid}}" title="Outpoint {{$vin.Txid}},{{$vin.Vout}}">➡&nbsp;</a>
                                   {{- end -}}
                                 </span>
