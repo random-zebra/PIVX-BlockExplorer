@@ -1,4 +1,4 @@
-formatAmount0{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbook}}{{$be := .Info.Backend}}{{$blocks := .Blocks}}{{$zcs := $be.ZerocoinSupply}}
+{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbook}}{{$be := .Info.Backend}}{{$blocks := .Blocks}}
 {{- if $bb.InitialSync -}}
 <h3 class="bg-danger text-white" style="padding: 20px;">Application is now in initial synchronization and does not provide any data.</h3>
 {{- end -}}
@@ -18,9 +18,9 @@ formatAmount0{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbo
     <div class="col-md-2"></div>
 </div>
 {{- end -}}
+<h3>Block index</h3>
 <div class="row">
     <div class="col-md-6">
-        <h3>Block index</h3>
         <table class="table data-table">
             <tbody>
                 <tr>
@@ -38,20 +38,12 @@ formatAmount0{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbo
                     <td class="data ellipsis">{{$be.Bestblockhash}}</td>
                 </tr>
                 <tr>
-                    <td>Last Block Update</td>
-                    <td class="data">{{formatTime $bb.LastBlockTime}}</td>
+                    <td>Mempool Size</td>
+                    <td class="data">{{$bb.MempoolSize}}</td>
                 </tr>
                 <tr>
-                    <td>Difficulty</td>
-                    <td class="data">{{$be.Difficulty}}</td>
-                </tr>
-                <tr>
-                    <td>Total Money Supply</td>
-                    <td class="data">{{formatAmount2 $be.MoneySupply}}&nbsp;{{$cs}}</td>
-                </tr>
-                <tr title="amount and % over total money supply">
-                    <td>Zerocoin Supply</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_TOT}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_TOT $be.MoneySupply}})</em></td>
+                    <td>Protocol Version</td>
+                    <td class="data">{{$be.ProtocolVersion}}</td>
                 </tr>
                 <tr>
                     <td>Masternode Count</td>
@@ -65,48 +57,40 @@ formatAmount0{{define "specific"}}{{$cs := .CoinShortcut}}{{$bb := .Info.Blockbo
         </table>
     </div>
     <div class="col-md-6">
-        <h3>Zerocoin supply</h3>
         <table class="table data-table">
             <tbody>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>1-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_1 1}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_1}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_1 $be.MoneySupply}})</em></td>
+                <tr>
+                    <td>Difficulty</td>
+                    <td class="data">{{$be.Difficulty}}</td>
                 </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>5-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_5 5}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_5}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_5 $be.MoneySupply}})</em></td>
+                <tr>
+                    <td>Last Block Update</td>
+                    <td class="data">{{formatTime $bb.LastBlockTime}}</td>
                 </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>10-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_10 10}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_10}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_10 $be.MoneySupply}})</em></td>
+                <tr>
+                    <td>Last Mempool Update</td>
+                    <td class="data">{{formatTime $bb.LastMempoolTime}}</td>
                 </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>50-denom</em></td>
-                    <td style="width: 10%;" align="center" class="data">{{formatDenom $zcs.Denom_50 50}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_50}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_50 $be.MoneySupply}})</em></td>
+                <tr>
+                    <td>Total PIV Supply</td>
+                    <td class="data ellipsis">{{formatSupply $be.MoneySupply}}&nbsp;{{$cs}}</td>
                 </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>100-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_100 100}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_100}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_100 $be.MoneySupply}})</em></td>
+                <tr>
+                    <td>Transparent Supply</td>
+                    <td>
+                      <span class="data">{{formatSupply $be.TransparentSupply}}&nbsp;{{$cs}}</span>&nbsp;
+                      <em>({{getPercent $be.TransparentSupply $be.MoneySupply}})
+                    </td>
                 </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>500-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_500 500}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_500}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_500 $be.MoneySupply}})</em></td>
+                <tr>
+                    <td>Shielded Supply</td>
+                    <td>
+                      <span class="data">{{formatSupply $be.ShieldedSupply}}&nbsp;{{$cs}}</span>&nbsp;
+                      <em>({{getPercent $be.ShieldedSupply $be.MoneySupply}})
+                    </td>
                 </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>1000-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_1000 1000}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_1000}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_1000 $be.MoneySupply}})</em></td>
-                </tr>
-                <tr title="amount and % over total supply">
-                    <td align="right"> <em>5000-denom</em></td>
-                    <td align="center" class="data">{{formatDenom $zcs.Denom_5000 5000}}</td>
-                    <td><span class="data">{{formatAmount0 $zcs.Denom_5000}}&nbsp;z{{$cs}}</span>&nbsp;<em>({{getPercent $zcs.Denom_5000 $be.MoneySupply}})</em></td>
+
+                <tr>
                 </tr>
             </tbody>
         </table>

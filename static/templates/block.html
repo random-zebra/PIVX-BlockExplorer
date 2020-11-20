@@ -1,4 +1,4 @@
-{{define "specific"}}{{$cs := .CoinShortcut}}{{$b := .Block}}{{$data := . -}}{{$zcs := $b.ZerocoinSupply}}
+{{define "specific"}}{{$cs := .CoinShortcut}}{{$b := .Block}}{{$data := . -}}
 <h1>Block {{$b.Height}}</h1>
 <div class="alert alert-data ellipsis">
     <span class="data">{{$b.Hash}}</span>
@@ -37,8 +37,8 @@
                     <td class="data">{{$b.Size}}</td>
                 </tr>
                 <tr>
-                    <td>Total Supply</td>
-                    <td class="data">{{formatAmount2 $b.MoneySupply}} {{$cs}}</td>
+                    <td>Difficulty</td>
+                    <td class="data ellipsis">{{$b.Difficulty}}</td>
                 </tr>
             </tbody>
         </table>
@@ -55,20 +55,16 @@
                     <td class="data ellipsis">{{$b.MerkleRoot}}</td>
                 </tr>
                 <tr>
-                    <td>Nonce</td>
-                    <td class="data ellipsis">{{$b.Nonce}}</td>
+                    <td>Sapling Root</td>
+                    <td class="data ellipsis">{{$b.SaplingRoot}}</td>
                 </tr>
                 <tr>
                     <td>Bits</td>
                     <td class="data ellipsis">{{$b.Bits}}</td>
                 </tr>
                 <tr>
-                    <td>Difficulty</td>
-                    <td class="data ellipsis">{{$b.Difficulty}}</td>
-                </tr>
-                <tr>
-                    <td>Zerocoin Supply</td>
-                    <td class="data">{{formatAmount0 $b.ZerocoinSupply.Denom_TOT}} {{$cs}}&nbsp;<em>({{getPercent $zcs.Denom_TOT $b.MoneySupply}})</em></td>
+                    <td>Nonce</td>
+                    <td class="data ellipsis">{{$b.Nonce}}</td>
                 </tr>
             </tbody>
         </table>

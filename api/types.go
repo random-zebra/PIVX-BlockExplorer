@@ -189,6 +189,9 @@ type Tx struct {
 	Size             int               `json:"size,omitempty"`
 	ValueOutSat      *Amount           `json:"value"`
 	ValueInSat       *Amount           `json:"valueIn,omitempty"`
+	ShieldIns 		   int               `json:"shieldedIns,omitempty"`
+	ShieldOuts 		   int               `json:"shieldedOuts,omitempty"`
+	ShieldValBal     *Amount           `json:"valueBalanceSat,omitempty"`
 	FeesSat          *Amount           `json:"fees,omitempty"`
 	Hex              string            `json:"hex,omitempty"`
 	CoinSpecificData interface{}       `json:"-"`
@@ -307,8 +310,7 @@ type BlockInfo struct {
 	Bits          string      `json:"bits"`
 	Difficulty    string      `json:"difficulty"`
 	Txids         []string    `json:"tx,omitempty"`
-    MoneySupply   json.Number `json:"moneysupply,omitempty"`
-    ZerocoinSupply  bchain.ZCdenoms    `json:"zPIVsupply,omitempty"`
+	SaplingRoot   string      `json:"finalsaplingroot,omitempty"`
 }
 
 // Block contains information about block
@@ -354,10 +356,11 @@ type BackendInfo struct {
 	ProtocolVersion string  `json:"protocolVersion"`
 	Timeoffset      float64 `json:"timeOffset"`
 	Warnings        string  `json:"warnings"`
-    MoneySupply   json.Number `json:"moneysupply"`
-    ZerocoinSupply  bchain.ZCdenoms    `json:"zPIVsupply"`
-    MasternodeCount int `json:"masternodecount"`
-    NextSuperBlock int `json:"masternodecount"`
+  TransparentSupply   json.Number `json:"transparentsupply"`
+	ShieldedSupply   json.Number `json:"shieldedsupply"`
+	MoneySupply   json.Number `json:"moneysupply"`
+  MasternodeCount int `json:"masternodecount"`
+  NextSuperBlock int `json:"masternodecount"`
 }
 
 // SystemInfo contains information about the running blockbook and backend instance

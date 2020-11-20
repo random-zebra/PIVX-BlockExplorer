@@ -441,13 +441,13 @@ func (s *PublicServer) parseTemplates() []*template.Template {
 		"formatAmount":             s.formatAmount,
 		"formatAmountWithDecimals": formatAmountWithDecimals,
 		"setTxToTemplateData":      setTxToTemplateData,
-        "isOwnAddress":             isOwnAddress,
-        "isOwnAddresses":           isOwnAddresses,
-        "formatAmount2":            formatAmount2,
-        "getPercent":               getPercent,
-        "formatAmount0":            formatAmount0,
-        "formatDenom":              formatDenom,
-        "isP2CS":					isP2CS,
+    "isOwnAddress":             isOwnAddress,
+    "isOwnAddresses":           isOwnAddresses,
+		"formatNegatedAmount":		  s.formatNegatedAmount,
+		"formatSupply":						  formatSupply,
+    "getPercent":               getPercent,
+    "isP2CS":										isP2CS,
+		"IsShielded":								IsShielded,
 	}
 	var createTemplate func(filenames ...string) *template.Template
 	if s.debug {
@@ -1207,32 +1207,64 @@ func (s *PublicServer) apiFindzcserial(r *http.Request, apiVersion int) (interfa
     return nil, api.NewAPIError("Missing parameter 'serialHex'", true)
 }
 
-
-// formatAmount2 prints float rounding to two decimals
-func formatAmount2(a json.Number) string {
-    val, _ := a.Float64()
-    return fmt.Sprintf("%.8f", val)
+// formatNegatedAmount negate amount and print
+func (s *PublicServer) formatNegatedAmount(a *api.Amount) string {
+	if a == nil {
+		return ""
+	}
+	x := (big.Int)(*a)
+	x.Neg(&x)
+	return s.formatAmount((*api.Amount)(&x))
 }
 
-// formatAmount0 prints float rounding to zero decimals
-func formatAmount0(a json.Number) string {
-    val, _ := a.Float64()
-    return fmt.Sprintf("%.0f", val)
+// format with spaces after thousands and 2 decimals
+// based on https://github.com/icza/gox/blob/master/fmtx/fmtx.go
+func formatSupply(a json.Number) string {
+	x, _ := a.Float64()
+	if x == 0 {
+		return "0.00"
+	}
+	in := strconv.FormatFloat(x, 'f', -1, 64)
+	slices := strings.Split(in, ".")
+	in = slices[0]
+	decimals := ""
+	if len(slices) > 1 {
+		decimals = slices[1][:2]
+	}
+	numOfDigits := len(in)
+	if x < 0 {
+		numOfDigits-- // First character is the - sign (not a digit)
+	}
+	numOfSpaces := (numOfDigits - 1) / 3
+	out := make([]byte, len(in)+numOfSpaces)
+	if x < 0 {
+		in, out[0] = in[1:], '-'
+	}
+
+	for i, j, k := len(in)-1, len(out)-1, 0; ; i, j = i-1, j-1 {
+		out[j] = in[i]
+		if i == 0 {
+			if len(decimals) == 0 {
+				return string(out)
+			}
+			return fmt.Sprintf("%s.%s", string(out), decimals)
+		}
+		if k++; k == 3 {
+			j, k = j-1, 0
+			out[j] = ' '
+		}
+	}
 }
 
 // getPercent returns the float to 2 decimal places and appends %
 func getPercent(a json.Number, b json.Number) string {
     x, _ := a.Float64()
     y, _ := b.Float64()
+		if y == 0 {
+			return "0.00 %"
+		}
     percent := 100 * x / y
-    return fmt.Sprintf("%.2f%%", percent)
-}
-
-// returns the amount of tokens on a given zerocoin denom
-func formatDenom(supply json.Number, den int) string {
-    val, _ := supply.Float64()
-    coins := val / float64(den)
-    return fmt.Sprintf("%.0f", coins)
+    return fmt.Sprintf("%.2f %%", percent)
 }
 
 // returns true if scriptPubKey is P2CS
@@ -1244,4 +1276,12 @@ func isP2CS(addrs []string) bool {
 	// !TODO: implement flag in Vin and Vout objects
 	return (len(addrs[0]) > 0 &&
 				 (addrs[0][0:1] == "S" || addrs[0][0:1] == "W"))
+}
+
+// returns true if shielded transaction
+func IsShielded(tx *api.Tx) bool {
+	if tx.ShieldIns > 0 || tx.ShieldOuts > 0 {
+		return true
+	}
+	return tx.ShieldValBal != nil && !api.IsZeroBigInt((*big.Int)(tx.ShieldValBal))
 }

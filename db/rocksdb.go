@@ -398,6 +398,9 @@ type TxAddresses struct {
 	Height  uint32
 	Inputs  []TxInput
 	Outputs []TxOutput
+	ShieldIns    int
+	ShieldOuts   int
+	ShieldValBal big.Int
 }
 
 // Utxo holds information about unspent transaction output

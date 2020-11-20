@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/golang/glog"
+	"github.com/juju/errors"
 )
 
 // PivXRPC is an interface to JSON-RPC bitcoind service.
@@ -60,6 +61,50 @@ func (b *PivXRPC) Initialize() error {
 	return nil
 }
 
+// GetBlock returns block with given hash.
+func (z *PivXRPC) GetBlock(hash string, height uint32) (*bchain.Block, error) {
+	var err error
+	if hash == "" && height > 0 {
+		hash, err = z.GetBlockHash(height)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	glog.V(1).Info("rpc: getblock (verbosity=1) ", hash)
+
+	res := btc.ResGetBlockThin{}
+	req := btc.CmdGetBlock{Method: "getblock"}
+	req.Params.BlockHash = hash
+	req.Params.Verbosity = 1
+	err = z.Call(&req, &res)
+
+	if err != nil {
+		return nil, errors.Annotatef(err, "hash %v", hash)
+	}
+	if res.Error != nil {
+		return nil, errors.Annotatef(res.Error, "hash %v", hash)
+	}
+
+	txs := make([]bchain.Tx, 0, len(res.Result.Txids))
+	for _, txid := range res.Result.Txids {
+		tx, err := z.GetTransaction(txid)
+		if err != nil {
+			if err == bchain.ErrTxNotFound {
+				glog.Errorf("rpc: getblock: skipping transanction in block %s due error: %s", hash, err)
+				continue
+			}
+			return nil, err
+		}
+		txs = append(txs, *tx)
+	}
+	block := &bchain.Block{
+		BlockHeader: res.Result.BlockHeader,
+		Txs:         txs,
+	}
+	return block, nil
+}
+
 
 // getinfo
 
@@ -70,8 +115,9 @@ type CmdGetInfo struct {
 type ResGetInfo struct {
 	Error  *bchain.RPCError `json:"error"`
 	Result struct {
-        MoneySupply   json.Number `json:"moneysupply"`
-        ZerocoinSupply  bchain.ZCdenoms    `json:"zPIVsupply"`
+        TransparentSupply   json.Number `json:"transparentsupply"`
+				ShieldedSupply   json.Number `json:"shieldedsupply"`
+				MoneySupply   json.Number `json:"moneysupply"`
 	} `json:"result"`
 }
 
@@ -101,7 +147,7 @@ func (b *PivXRPC) GetNextSuperBlock(nHeight int) int {
 }
 
 // GetChainInfo returns information about the connected backend
-// PIVX adds MoneySupply and ZerocoinSupply to btc implementation
+// PIVX adds Money Supply to btc implementation
 func (b *PivXRPC) GetChainInfo() (*bchain.ChainInfo, error) {
     rv, err := b.BitcoinGetChainInfo()
     if err != nil {
@@ -118,8 +164,9 @@ func (b *PivXRPC) GetChainInfo() (*bchain.ChainInfo, error) {
     if resGi.Error != nil {
         return nil, resGi.Error
     }
-    rv.MoneySupply = resGi.Result.MoneySupply
-    rv.ZerocoinSupply = resGi.Result.ZerocoinSupply
+    rv.TransparentSupply = resGi.Result.TransparentSupply
+		rv.ShieldedSupply = resGi.Result.ShieldedSupply
+		rv.MoneySupply = resGi.Result.MoneySupply
 
     glog.V(1).Info("rpc: getmasternodecount")
 

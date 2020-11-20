@@ -3,21 +3,20 @@ package pivx
 import (
 	"blockbook/bchain"
 	"blockbook/bchain/coins/btc"
-	"blockbook/bchain/coins/utils"
 	"bytes"
 	"io"
-    "fmt"
+  "fmt"
 
-    "encoding/binary"
+  "encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 
-    "math"
+  "math"
 	"math/big"
 
-    "github.com/golang/glog"
+  "github.com/golang/glog"
 	"github.com/juju/errors"
-    "github.com/martinboehm/btcd/blockchain"
+  "github.com/martinboehm/btcd/blockchain"
 	"github.com/martinboehm/btcd/wire"
 	"github.com/martinboehm/btcutil"
 	"github.com/martinboehm/btcutil/chaincfg"
@@ -106,40 +105,6 @@ func GetChainParams(chain string) *chaincfg.Params {
 	default:
 		return &MainNetParams
 	}
-}
-
-// ParseBlock parses raw block to our Block struct
-func (p *PivXParser) ParseBlock(b []byte) (*bchain.Block, error) {
-	r := bytes.NewReader(b)
-	w := wire.MsgBlock{}
-	h := wire.BlockHeader{}
-	err := h.Deserialize(r)
-	if err != nil {
-		return nil, errors.Annotatef(err, "Deserialize")
-	}
-
-	if h.Version > 3 && h.Version < 7 {
-		// Skip past AccumulatorCheckpoint
-		r.Seek(32, io.SeekCurrent)
-	}
-
-	err = utils.DecodeTransactions(r, 0, wire.WitnessEncoding, &w)
-	if err != nil {
-		return nil, errors.Annotatef(err, "DecodeTransactions")
-	}
-
-	txs := make([]bchain.Tx, len(w.Transactions))
-	for ti, t := range w.Transactions {
-		txs[ti] = p.TxFromMsgTx(t, false)
-	}
-
-	return &bchain.Block{
-		BlockHeader: bchain.BlockHeader{
-			Size: len(b),
-			Time: h.Timestamp.Unix(),
-		},
-		Txs: txs,
-	}, nil
 }
 
 // PackTx packs transaction to byte array using protobuf
