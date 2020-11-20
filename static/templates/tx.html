@@ -1,5 +1,5 @@
-{{define "specific"}}{{$cs := .CoinShortcut}}{{$tx := .Tx}}
-<h1>Transaction</h1>
+{{define "specific"}}{{$cs := .CoinShortcut}}{{$tx := .Tx}}{{$isShielded := IsShielded $tx}}
+<h1>{{- if $isShielded -}}Shield {{end}}Transaction</h1>
 <div class="alert alert-data ellipsis">
     <span class="data">{{$tx.Txid}}</span>
 </div>
@@ -52,13 +52,21 @@
             </tr>
             {{- else -}}
             <tr>
-                <td>Total Input</td>
+                <td>Total Transparent Input</td>
                 <td class="data">{{formatAmount $tx.ValueInSat}} {{$cs}}</td>
             </tr>
             <tr>
-                <td>Total Output</td>
+                <td>Total Transparent Output</td>
                 <td class="data">{{formatAmount $tx.ValueOutSat}} {{$cs}}</td>
             </tr>
+            {{- if $isShielded -}}
+            <tr>
+                <td>Shielded Spends / Outputs / Value Transfer</td>
+                <td class="data"  title="Shielded Value Transfer: PIV value transferred from the transparent pool to the shielded pool (shielded outputs value minus shielded spends value)">
+                  {{$tx.ShieldIns}} / {{$tx.ShieldOuts}} / {{formatNegatedAmount $tx.ShieldValBal}} {{$cs}}
+                </td>
+            </tr>
+            {{- end -}}
             {{- end -}}
             {{- if $tx.FeesSat -}}
             <tr>

@@ -1,4 +1,4 @@
-{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}
+{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}{{$saplingValue := formatNegatedAmount $tx.ShieldValBal}}
 <div class="alert alert-data">
     <div class="row line-bot">
         <div class="col-xs-7 col-md-8 ellipsis">
@@ -11,6 +11,12 @@
             <div class="row tx-in">
                 <table class="table data-table">
                     <tbody>
+                        {{- if gt $tx.ShieldIns 0 -}}
+                        <tr><td>
+                          <span class="tx-addr">{{$tx.ShieldIns}} Shielded Spends</span>
+                          <span class="tx-amt">🛡</span>
+                        </td></tr>
+                        {{- end -}}
                         {{- range $vin := $tx.Vin -}}
                         <tr{{if isOwnAddresses $data $vin.Addresses}} class="tx-own"{{end}}>
                             <td>
@@ -58,6 +64,12 @@
             <div class="row tx-out">
                 <table class="table data-table">
                     <tbody>
+                        {{- if gt $tx.ShieldOuts 0 -}}
+                        <tr><td>
+                          <span class="tx-addr">{{$tx.ShieldOuts}} Shielded Outputs</span>
+                          <span class="tx-amt">🛡</span>
+                        </td></tr>
+                        {{- end -}}
                         {{- range $vout := $tx.Vout -}}
                         <tr{{if isOwnAddresses $data $vout.Addresses}} class="tx-own"{{end}}>
                             <td>
@@ -92,12 +104,17 @@
         </div>
     </div>
     <div class="row line-top">
-        <div class="col-xs-6 col-sm-4 col-md-4">
+        <div class="col-xs-6 col-sm-6 col-md-6">
             {{- if $tx.FeesSat -}}
             <span class="txvalues txvalues-default">Fee: {{formatAmount $tx.FeesSat}} {{$cs}}</span>
             {{- end -}}
+            {{- if ne $saplingValue "" -}}
+            <span class="txvalues txvalues-default" title="Value transferred from the transparent pool to the shielded pool (shielded outputs value minus shielded spends value)">
+              Shielded Value Transfer: {{$saplingValue}} {{$cs}}
+            </span>
+            {{- end -}}
         </div>
-        <div class="col-xs-6 col-sm-8 col-md-8 text-right">
+        <div class="col-xs-6 col-sm-6 col-md-6 text-right">
             {{- if $tx.Confirmations -}}
             <span class="txvalues txvalues-success">{{$tx.Confirmations}} Confirmations</span>
             {{- else -}}

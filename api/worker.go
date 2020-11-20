@@ -248,6 +248,7 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 		if feesSat.Sign() == -1 {
 			feesSat.SetUint64(0)
 		}
+
 		pValInSat = &valInSat
 	} else if w.chainType == bchain.ChainEthereumType {
 		ets, err := w.chainParser.EthereumTypeGetErc20FromTx(bchainTx)
@@ -305,6 +306,13 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 			return nil, err
 		}
 	}
+	// add shielded net value to fee
+	saplingBalance := &bchainTx.ShieldValBal
+	if IsZeroBigInt(saplingBalance) {
+		saplingBalance = nil
+	} else {
+		feesSat.Add(&feesSat, saplingBalance)
+	}
 	// for mempool transaction get first seen time
 	if bchainTx.Confirmations == 0 {
 		bchainTx.Blocktime = int64(w.mempool.GetTransactionTime(bchainTx.Txid))
@@ -319,6 +327,9 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 		Txid:             bchainTx.Txid,
 		ValueInSat:       (*Amount)(pValInSat),
 		ValueOutSat:      (*Amount)(&valOutSat),
+		ShieldIns:		    bchainTx.ShieldIns,
+		ShieldOuts:		    bchainTx.ShieldOuts,
+		ShieldValBal:		  (*Amount)(saplingBalance),
 		Version:          bchainTx.Version,
 		Hex:              bchainTx.Hex,
 		Vin:              vins,
@@ -455,11 +466,20 @@ func (w *Worker) txFromTxAddress(txid string, ta *db.TxAddresses, bi *db.BlockIn
 		}
 		vout.Spent = tao.Spent
 	}
+
 	// for coinbase transactions valIn is 0
 	feesSat.Sub(&valInSat, &valOutSat)
 	if feesSat.Sign() == -1 {
 		feesSat.SetUint64(0)
 	}
+	// add shielded net value to fee
+	saplingBalance := &ta.ShieldValBal
+	if IsZeroBigInt(saplingBalance) {
+		saplingBalance = nil
+	} else {
+		feesSat.Add(&feesSat, saplingBalance)
+	}
+
 	r := &Tx{
 		Blockhash:     bi.Hash,
 		Blockheight:   int(ta.Height),
@@ -471,6 +491,9 @@ func (w *Worker) txFromTxAddress(txid string, ta *db.TxAddresses, bi *db.BlockIn
 		ValueOutSat:   (*Amount)(&valOutSat),
 		Vin:           vins,
 		Vout:          vouts,
+		ShieldIns:		 ta.ShieldIns,
+		ShieldOuts:    ta.ShieldOuts,
+		ShieldValBal:	 (*Amount)(saplingBalance),
 	}
 	return r
 }
@@ -1026,8 +1049,7 @@ func (w *Worker) GetBlock(bid string, page int, txsOnPage int) (*Block, error) {
 			Nonce:         string(bi.Nonce),
 			Txids:         bi.Txids,
 			Version:       bi.Version,
-            MoneySupply:   bi.MoneySupply,
-            ZerocoinSupply: bi.ZerocoinSupply,
+			SaplingRoot:   bi.SaplingRoot,
 		},
 		TxCount:      txCount,
 		Transactions: txs,
@@ -1142,10 +1164,11 @@ func (w *Worker) GetSystemInfo(internal bool) (*SystemInfo, error) {
 		Timeoffset:      ci.Timeoffset,
 		Version:         ci.Version,
 		Warnings:        ci.Warnings,
-        MoneySupply:     ci.MoneySupply,
-        ZerocoinSupply:  ci.ZerocoinSupply,
-        MasternodeCount: ci.MasternodeCount,
-        NextSuperBlock:  ci.NextSuperBlock,
+    TransparentSupply:  ci.TransparentSupply,
+		ShieldedSupply:     ci.ShieldedSupply,
+		MoneySupply:        ci.MoneySupply,
+    MasternodeCount: ci.MasternodeCount,
+    NextSuperBlock:  ci.NextSuperBlock,
 	}
 	glog.Info("GetSystemInfo finished in ", time.Since(start))
 	return &SystemInfo{blockbookInfo, backendInfo}, nil

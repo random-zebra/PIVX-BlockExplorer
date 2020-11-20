@@ -86,6 +86,10 @@ type Tx struct {
 	Confirmations    uint32      `json:"confirmations,omitempty"`
 	Time             int64       `json:"time,omitempty"`
 	Blocktime        int64       `json:"blocktime,omitempty"`
+	// PIVX Shield
+	ShieldIns				 int	  		 `json:"shieldins,omitempty"`
+	ShieldOuts			 int  			 `json:"shieldouts,omitempty"`
+	ShieldValBal		 big.Int		 `json:"valueBalanceSat"`
 	CoinSpecificData interface{} `json:"-"`
 }
 
@@ -106,19 +110,6 @@ type BlockHeader struct {
 	Time          int64  `json:"time,omitempty"`
 }
 
-// Zerocoin denom supply
-type ZCdenoms struct {
-    Denom_1     json.Number   `json:"1"`
-    Denom_5     json.Number   `json:"5"`
-    Denom_10    json.Number   `json:"10"`
-    Denom_50    json.Number   `json:"50"`
-    Denom_100   json.Number   `json:"100"`
-    Denom_500   json.Number   `json:"500"`
-    Denom_1000  json.Number   `json:"1000"`
-    Denom_5000  json.Number   `json:"5000"`
-    Denom_TOT   json.Number   `json:"total"`
-}
-
 // BlockInfo contains extended block header data and a list of block txids
 type BlockInfo struct {
 	BlockHeader
@@ -128,8 +119,7 @@ type BlockInfo struct {
 	Bits       string      `json:"bits"`
 	Difficulty json.Number `json:"difficulty"`
 	Txids      []string    `json:"tx,omitempty"`
-    MoneySupply   json.Number `json:"moneysupply"`
-    ZerocoinSupply  ZCdenoms    `json:"zPIVsupply"`
+	SaplingRoot string      `json:"finalsaplingroot"`
 }
 
 // MempoolEntry is used to get data about mempool entry
@@ -163,10 +153,11 @@ type ChainInfo struct {
 	ProtocolVersion string  `json:"protocolversion"`
 	Timeoffset      float64 `json:"timeoffset"`
 	Warnings        string  `json:"warnings"`
-    MoneySupply   json.Number `json:"moneysupply"`
-    ZerocoinSupply  ZCdenoms    `json:"zPIVsupply"`
-    MasternodeCount int `json:"masternodecount"`
-    NextSuperBlock int `json:"masternodecount"`
+  TransparentSupply   json.Number `json:"transparentsupply"`
+	ShieldedSupply   json.Number `json:"shieldedsupply"`
+	MoneySupply   json.Number `json:"moneysupply"`
+  MasternodeCount int `json:"masternodecount"`
+  NextSuperBlock int `json:"masternodecount"`
 }
 
 // RPCError defines rpc error returned by backend
