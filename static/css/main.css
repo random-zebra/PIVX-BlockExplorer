@@ -92,12 +92,12 @@ h3 {
     margin: 0;
     padding-bottom: 0;
     padding-top: 0;
-    background-color: #212121;
+    background-color: #2c0b4c;
     border: 0;
 }
 
 .bg-trezor {
-    background-color: #212121!important;
+    background: linear-gradient( to right, #2c0b4c,#490e78,#2c0b4c) !important;
     height: 53px;
 }
 
@@ -120,7 +120,7 @@ h3 {
 }
 
 #footer {
-    background-color: #212121;
+    background-color: #2c0b4c;
     color: #fff;
     height: 53px;
     overflow: hidden;
