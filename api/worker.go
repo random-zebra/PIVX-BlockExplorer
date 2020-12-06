@@ -245,9 +245,6 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 	if w.chainType == bchain.ChainBitcoinType {
 		// for coinbase transactions valIn is 0
 		feesSat.Sub(&valInSat, &valOutSat)
-		if feesSat.Sign() == -1 {
-			feesSat.SetUint64(0)
-		}
 
 		pValInSat = &valInSat
 	} else if w.chainType == bchain.ChainEthereumType {
@@ -314,6 +311,9 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 		saplingBalance = nil
 	} else {
 		feesSat.Add(&feesSat, saplingBalance)
+	}
+	if feesSat.Sign() == -1 {
+		feesSat.SetUint64(0)
 	}
 	// for mempool transaction get first seen time
 	if bchainTx.Confirmations == 0 {
