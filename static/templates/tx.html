@@ -62,8 +62,8 @@
             {{- if $isShielded -}}
             <tr>
                 <td>Shielded Spends / Outputs / Value Transfer</td>
-                <td class="data"  title="Shielded Value Transfer: PIV value transferred from the transparent pool to the shielded pool (shielded outputs value minus shielded spends value)">
-                  {{$tx.ShieldIns}} / {{$tx.ShieldOuts}} / {{formatNegatedAmount $tx.ShieldValBal}} {{$cs}}
+                <td class="data"  title="Shielded Value Transfer: PIV value transferred from the shielded pool to the transparent pool (total shielded spends value minus total shielded outputs value)">
+                  {{$tx.ShieldIns}} / {{$tx.ShieldOuts}} / {{formatAmount $tx.ShieldValBal}} {{$cs}}
                 </td>
             </tr>
             {{- end -}}

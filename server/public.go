@@ -443,7 +443,6 @@ func (s *PublicServer) parseTemplates() []*template.Template {
 		"setTxToTemplateData":      setTxToTemplateData,
     "isOwnAddress":             isOwnAddress,
     "isOwnAddresses":           isOwnAddresses,
-		"formatNegatedAmount":		  s.formatNegatedAmount,
 		"formatSupply":						  formatSupply,
     "getPercent":               getPercent,
     "isP2CS":										isP2CS,
@@ -1205,16 +1204,6 @@ func (s *PublicServer) apiFindzcserial(r *http.Request, apiVersion int) (interfa
     }
 
     return nil, api.NewAPIError("Missing parameter 'serialHex'", true)
-}
-
-// formatNegatedAmount negate amount and print
-func (s *PublicServer) formatNegatedAmount(a *api.Amount) string {
-	if a == nil {
-		return ""
-	}
-	x := (big.Int)(*a)
-	x.Neg(&x)
-	return s.formatAmount((*api.Amount)(&x))
 }
 
 // format with spaces after thousands and 2 decimals
