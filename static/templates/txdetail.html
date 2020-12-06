@@ -103,14 +103,14 @@
             {{- if ne $saplingValue "" -}}
                {{- if IsPositive $tx.ShieldValBal -}}
                <span class="txvalues txvalues-default" title="Total value transferred from the Shield pool to the Transparent pool">
-                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#shield-shaded"/></svg>
-                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-right-short"/></svg>
-                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#server"/></svg>
+                 <img src="/static/shield-shaded.svg" alt="" width="16" height="16">
+                 <img src="/static/arrow-right-short.svg" alt="" width="16" height="16">
+                 <img src="/static/server.svg" alt="" width="16" height="16">
                {{- else -}}
                <span class="txvalues txvalues-default" title="Total value transferred from the Transparent pool to the Shielded pool">
-                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#server"/></svg>
-                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-right-short"/></svg>
-                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#shield-shaded"/></svg>
+                 <img src="/static/server.svg" alt="" width="16" height="16">
+                 <img src="/static/arrow-right-short.svg" alt="" width="16" height="16">
+                 <img src="/static/shield-shaded.svg" alt="" width="16" height="16">
                {{- end -}}
                 &nbsp; {{$saplingValue}} {{$cs}}
                </span>
