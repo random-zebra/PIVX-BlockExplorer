@@ -73,6 +73,14 @@ type Vout struct {
 	ScriptPubKey ScriptPubKey `json:"scriptPubKey"`
 }
 
+type VShieldIn struct {
+	Data		json.RawMessage
+}
+
+type VShieldOut struct {
+	Data		json.RawMessage
+}
+
 // Tx is blockchain transaction
 // unnecessary fields are commented out to avoid overhead
 type Tx struct {
@@ -87,9 +95,10 @@ type Tx struct {
 	Time             int64       `json:"time,omitempty"`
 	Blocktime        int64       `json:"blocktime,omitempty"`
 	// PIVX Shield
-	ShieldIns				 int	  		 `json:"shieldins,omitempty"`
-	ShieldOuts			 int  			 `json:"shieldouts,omitempty"`
-	ShieldValBal		 big.Int		 `json:"valueBalanceSat"`
+	VShieldIn				 []VShieldIn  `json:"vShieldedSpend,omitempty"`
+	VShieldOut			 []VShieldOut `json:"vShieldedOutput,omitempty"`
+	ShieldValBal		 big.Int		  `json:"valueBalanceSat"`
+
 	CoinSpecificData interface{} `json:"-"`
 }
 
