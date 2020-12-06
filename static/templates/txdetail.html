@@ -1,4 +1,4 @@
-{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}{{$saplingValue := formatAmount $tx.ShieldValBal}}
+{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}{{$saplingValue := formatAbsAmount $tx.ShieldValBal}}
 <div class="alert alert-data">
     <div class="row line-bot">
         <div class="col-xs-7 col-md-8 ellipsis">
@@ -102,7 +102,7 @@
             {{- end -}}
             {{- if ne $saplingValue "" -}}
             <span class="txvalues txvalues-default" title="Shielded Value Transfer: PIV value transferred from the shielded pool to the transparent pool (total shielded spends value minus total shielded outputs value)">
-              Shielded Value Transfer: {{$saplingValue}} {{$cs}}
+              {{- if gt $saplingValue 0 -}}🛡⇢⛁{{- else -}}⛁⇢🛡{{- end -}}{{$saplingValue}} {{$cs}}
             </span>
             {{- end -}}
         </div>

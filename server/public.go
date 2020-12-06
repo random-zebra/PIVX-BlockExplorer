@@ -439,6 +439,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
 		"formatTime":               formatTime,
 		"formatUnixTime":           formatUnixTime,
 		"formatAmount":             s.formatAmount,
+		"formatAbsAmount":				  s.formatAbsAmount,
 		"formatAmountWithDecimals": formatAmountWithDecimals,
 		"setTxToTemplateData":      setTxToTemplateData,
     "isOwnAddress":             isOwnAddress,
@@ -1273,4 +1274,14 @@ func IsShielded(tx *api.Tx) bool {
 		return true
 	}
 	return tx.ShieldValBal != nil && !api.IsZeroBigInt((*big.Int)(tx.ShieldValBal))
+}
+
+// format absolute value of amount
+func (s *PublicServer) formatAbsAmount(a *api.Amount) string {
+	if a == nil {
+		return ""
+	}
+	x := (big.Int)(*a)
+	x.Abs(&x)
+	return s.formatAmount((*api.Amount)(&x))
 }
