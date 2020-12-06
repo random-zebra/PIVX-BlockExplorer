@@ -306,6 +306,8 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 			return nil, err
 		}
 	}
+
+	_ = json.Unmarshal(sj, bchainTx)
 	// add shielded net value to fee
 	saplingBalance := &bchainTx.ShieldValBal
 	if IsZeroBigInt(saplingBalance) {
@@ -327,8 +329,8 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 		Txid:             bchainTx.Txid,
 		ValueInSat:       (*Amount)(pValInSat),
 		ValueOutSat:      (*Amount)(&valOutSat),
-		ShieldIns:		    bchainTx.ShieldIns,
-		ShieldOuts:		    bchainTx.ShieldOuts,
+		ShieldIns:		    len(bchainTx.VShieldIn),
+		ShieldOuts:		    len(bchainTx.VShieldOut),
 		ShieldValBal:		  (*Amount)(saplingBalance),
 		Version:          bchainTx.Version,
 		Hex:              bchainTx.Hex,
