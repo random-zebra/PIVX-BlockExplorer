@@ -13,7 +13,7 @@
                     <tbody>
                         {{- if gt $tx.ShieldIns 0 -}}
                         <tr><td>
-                          <span class="tx-addr">{{$tx.ShieldIns}} Shielded Spends</span>
+                          <span class="tx-addr">{{$tx.ShieldIns}} Shielded Spend{{- if gt $tx.ShieldIns 1 -}}s{{- end -}}</span>
                           <span class="tx-amt">🛡</span>
                         </td></tr>
                         {{- end -}}
@@ -48,7 +48,7 @@
                         </tr>
                         {{- else -}}
                         <tr>
-                            <td>No Inputs</td>
+                            <td>No Transparent Inputs</td>
                         </tr>
                         {{- end -}}
                     </tbody>
@@ -66,7 +66,7 @@
                     <tbody>
                         {{- if gt $tx.ShieldOuts 0 -}}
                         <tr><td>
-                          <span class="tx-addr">{{$tx.ShieldOuts}} Shielded Outputs</span>
+                          <span class="tx-addr">{{$tx.ShieldOuts}} Shielded Output{{- if gt $tx.ShieldOuts 1 -}}s{{- end -}}</span>
                           <span class="tx-amt">🛡</span>
                         </td></tr>
                         {{- end -}}
@@ -95,7 +95,7 @@
                         </tr>
                         {{- else -}}
                         <tr>
-                            <td>No Outputs</td>
+                            <td>No Transparent Outputs</td>
                         </tr>
                         {{- end -}}
                     </tbody>
