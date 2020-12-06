@@ -305,16 +305,19 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
 	}
 
 	_ = json.Unmarshal(sj, bchainTx)
-	// add shielded net value to fee
+
 	saplingBalance := &bchainTx.ShieldValBal
 	if IsZeroBigInt(saplingBalance) {
+		// only transparent fee
 		saplingBalance = nil
+		if feesSat.Sign() == -1 {
+			feesSat.SetUint64(0)
+		}
 	} else {
+		// add shielded net value to transparent fee
 		feesSat.Add(&feesSat, saplingBalance)
 	}
-	if feesSat.Sign() == -1 {
-		feesSat.SetUint64(0)
-	}
+
 	// for mempool transaction get first seen time
 	if bchainTx.Confirmations == 0 {
 		bchainTx.Blocktime = int64(w.mempool.GetTransactionTime(bchainTx.Txid))
