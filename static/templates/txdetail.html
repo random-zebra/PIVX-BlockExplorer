@@ -101,7 +101,7 @@
             <span class="txvalues txvalues-default">Fee: {{formatAmount $tx.FeesSat}} {{$cs}}</span>
             {{- end -}}
             {{- if ne $saplingValue "" -}}
-               {{- if gt $saplingValue 0 -}}
+               {{- if gt $tx.ShieldValBal 0 -}}
                <span class="txvalues txvalues-default" title="Total value transferred from the Shield pool to the Transparent pool">🛡⇢⛁
                {{- else -}}
                <span class="txvalues txvalues-default" title="Total value transferred from the Transparent pool to the Shielded pool">⛁⇢🛡
