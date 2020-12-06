@@ -94,7 +94,7 @@ h3 {
 
 #footer {
     color: #fff;
-      /*bottom: 0px;*/  flex-shrink: none; vertical-align:middle;
+    flex-shrink: none; vertical-align:middle;
 
 }
 #footer a{
