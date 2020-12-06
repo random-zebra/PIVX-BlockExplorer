@@ -102,9 +102,15 @@
             {{- end -}}
             {{- if ne $saplingValue "" -}}
                {{- if IsPositive $tx.ShieldValBal -}}
-               <span class="txvalues txvalues-default" title="Total value transferred from the Shield pool to the Transparent pool">🛡⇢⛁
+               <span class="txvalues txvalues-default" title="Total value transferred from the Shield pool to the Transparent pool">
+                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#shield-shaded"/></svg>
+                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-right-short"/></svg>
+                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#server"/></svg>
                {{- else -}}
-               <span class="txvalues txvalues-default" title="Total value transferred from the Transparent pool to the Shielded pool">⛁⇢🛡
+               <span class="txvalues txvalues-default" title="Total value transferred from the Transparent pool to the Shielded pool">
+                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#server"/></svg>
+                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-right-short"/></svg>
+                 <svg class="bi" width="16" height="16" fill="currentColor"><use xlink:href="bootstrap-icons.svg#shield-shaded"/></svg>
                {{- end -}}
                 &nbsp; {{$saplingValue}} {{$cs}}
                </span>
