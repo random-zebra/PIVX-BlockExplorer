@@ -19,11 +19,8 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-sm navbar-dark bg-gradient">
             <div class="container">
-                <a class="navbar-brand d-none d-sm-flex" href="/" title="Home">
-                    <div alt="Logo" class="trezor-logo-svg-white"><img src="/static/pivx.png" height="40" /></div>
-                </a>
-                <a class="navbar-brand d-block d-sm-none" href="/" title="Home">
-                    <div alt="Logo-sm" class="trezor-logo-svg-white"><img src="/static/pivx-sm.png" height="40" /></div>
+                <a class="navbar-brand" href="/" title="Home">
+                    <div alt="Logo" class="trezor-logo-svg-white"><img src="pivx.png" alt="pivx-logo" height="40" /> <span class="explorer pull-left">Explorer</span></div>
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -55,7 +52,8 @@
             <div class="container pb-4 pt-2">
                 <form id="search" class="mx-2 my-auto d-inline w-100" action="/search" method="get">
                     <div class="input-group">
-                        <input name="q" type="text" class="form-control" placeholder="Search for block, transaction, address or xpub" focus="true">
+                        <label class="mr-sm-2 mb-0 sr-only" for="search">Search</label>
+                        <input type="text" class="form-control" name="search" placeholder="Search for block, transaction, address or xpub">
                         <span class="input-group-append">
                             <button class="btn btn-outline-secondary" type="button">GO</button>
                         </span>
