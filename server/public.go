@@ -448,6 +448,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
     "getPercent":               getPercent,
     "isP2CS":										isP2CS,
 		"IsShielded":								IsShielded,
+		"IsPositive":								IsPositive,
 	}
 	var createTemplate func(filenames ...string) *template.Template
 	if s.debug {
@@ -1284,4 +1285,13 @@ func (s *PublicServer) formatAbsAmount(a *api.Amount) string {
 	x := (big.Int)(*a)
 	x.Abs(&x)
 	return s.formatAmount((*api.Amount)(&x))
+}
+
+// true if a is >= 0
+func IsPositive(a *api.Amount) bool {
+	if a == nil {
+		return true
+	}
+	x := (big.Int)(*a)
+	return x.Sign() >= 0
 }
