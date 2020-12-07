@@ -9,7 +9,7 @@
         <tbody>
             <tr>
                 <td style="width: 25%;">In Block</td>
-                <td>{{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
+                <td class="data">{{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
                 {{- else -}}Unconfirmed{{end}}</td>
             </tr>
             <tr>
