@@ -1,4 +1,4 @@
-{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}{{$saplingValue := formatAbsAmount $tx.ShieldValBal}}
+{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}{{$saplingValue := formatAbsAmount $tx.ShieldValBal}}{{- $IsSaplingValuePos := IsPositive $tx.ShieldValBal -}}
 <div class="alert alert-data">
     <div class="row line-bot">
         <div class="col-xs-7 col-md-8 ellipsis">
@@ -101,18 +101,12 @@
             <span class="txvalues txvalues-default">Fee: {{formatAmount $tx.FeesSat}} {{$cs}}</span>
             {{- end -}}
             {{- if ne $saplingValue "" -}}
-               {{- if IsPositive $tx.ShieldValBal -}}
-               <span class="txvalues txvalues-default" title="Total value goin OUT of the Shield Pool">
-                 <img src="/static/shield-shaded.svg" alt="Shield Pool" width="10" height="10">
+               <span class="txvalues txvalues-default" {{- if $IsSaplingValuePos -}} title="Total value goin OUT of the Shield Pool"
+                                                       {{- else -}} title="Total value going INTO the Shielded Pool" {{- end -}}>
+                 {{$saplingValue}} {{$cs}} &nbsp;
+                 {{- if $IsSaplingValuePos -}}<img src="/static/shield-slash.svg" alt="Transparent Pool" width="11" height="11">
+                 {{- else -}}<img src="/static/shield-shaded.svg" alt="Shield Pool" width="11" height="11">{{- end -}}
                  <img src="/static/arrow-right-short.svg" alt="to" width="10" height="10">
-                 <img src="/static/server.svg" alt="Transparent Pool" width="10" height="10">
-               {{- else -}}
-               <span class="txvalues txvalues-default" title="Total value going INTO the Shielded Pool">
-                 <img src="/static/server.svg" alt="Transparent Pool" width="10" height="10">
-                 <img src="/static/arrow-right-short.svg" alt="to" width="10" height="10">
-                 <img src="/static/shield-shaded.svg" alt="Shield Pool" width="10" height="10">
-               {{- end -}}
-                &nbsp; {{$saplingValue}} {{$cs}}
                </span>
             {{- end -}}
         </div>
