@@ -8,9 +8,9 @@
     <table class="table data-table">
         <tbody>
             <tr>
-                <td>In Block</td>
-                {{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
-                {{- else -}}Unconfirmed{{end}}
+                <td style="width: 25%;">In Block</td>
+                <td>{{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
+                {{- else -}}Unconfirmed{{end}}</td>
             </tr>
             <tr>
                 <td style="width: 25%;">Time</td>
