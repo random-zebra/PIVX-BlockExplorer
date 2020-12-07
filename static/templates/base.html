@@ -1,106 +1,99 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/static/css/main.css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="{{.CoinName}} Explorer">
     <meta property="og:image" content="https://pivx.org/wp-content/uploads/2017/01/PIVX_illustrated_white.png" />
-    {{- if .IsCharts -}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-    <script src="/static/js/charts.js"></script>
-    {{- end -}}
     <title>{{.CoinName}} Explorer</title>
+    <link rel="icon" type="image/png" href="/static/pivx-32.png" />
 </head>
-
-<body>
-    <header id="header">
-        <div class="container">
-            <nav class="navbar navbar-expand navbar-dark bg-trezor">
-                <a class="navbar-brand d-none d-sm-flex" href="/" title="Home">
-                    <div alt="Logo" class="trezor-logo-svg-white">
-                        <img src="/static/pivx.png" height="42" />
-                    </div>
+<body class="d-flex flex-column">
+    <header id="header" class="container-fluid bg-purple">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-sm navbar-dark bg-gradient">
+            <div class="container">
+                <a class="navbar-brand" href="/" title="Home">
+                    <div alt="Logo" class="trezor-logo-svg-white"><img src="pivx.png" alt="pivx-logo" height="40" /> <span class="explorer pull-left">Explorer</span></div>
                 </a>
-                <a class="navbar-brand d-block d-sm-none" href="/" title="Home">
-                    <div alt="Logo-sm" class="trezor-logo-svg-white">
-                        <img src="/static/pivx-sm.png" height="42" />
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blocks">Blocks</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Charts</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/charts/network">Network Stats</a>
+                                <a class="dropdown-item" href="/charts/github">GitHub Activity</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/status">Status</a>
+                        </li>
+                        <li class="nav-ite md-none d-md-block">
+                            <a class="nav-link" href="/sendtx">Send-TX</a>
+                        </li>-->
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Search -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-gradient">
+            <div class="container pb-4 pt-2">
+                <form id="search" class="mx-2 my-auto d-inline w-100" action="/search" method="get">
+                    <div class="input-group">
+                        <label class="mr-sm-2 mb-0 sr-only" for="search">Search</label>
+                        <input type="text" class="form-control" name="search" placeholder="Search for block, transaction, address or xpub">
+                        <span class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button">GO</button>
+                        </span>
                     </div>
-                </a>
-                {{- if not .IsIndex -}}
-                <span class="navbar-text ml-md-auto d-none d-md-flex">
-                    <a href="/" class="nav-link">{{.CoinLabel}} Explorer</a>
-                </span>
-                {{- end -}}
-                {{- if .InternalExplorer -}}
-                <ul class="navbar-nav flex-row ml-md-auto">
-                    <li class="nav-item">
-                        <a href="/" class="nav-link">Index</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/blocks" class="nav-link">Blocks</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Charts</a>
-                        <div class="dropdown-menu">
-                          <a class="dropdown-item" href="/charts/supply">zPIV supply</a>
-                          <a class="dropdown-item" href="/charts/network">Network stats</a>
-                          <a class="dropdown-item" href="/charts/github">GitHub activity</a>
-                        </div>
-                    </li>
-                </ul>
-                {{- if not .IsIndex -}}
-                <span class="ml-md-auto navbar-form navbar-left">
-                    <form id="search" action="/search" method="get">
-                        <input name="q" type="text" class="form-control" placeholder="Search for block, transaction, address or xpub" focus="true">
-                    </form>
-                </span>
-                {{- end -}}
-                {{- end -}}
-                <ul class="navbar-nav flex-row ml-md-auto d-none d-lg-flex ">
-                    <li class="nav-item">
-                        <a href="https://pivx.org/" class="nav-link" target="_blank">PIVX.org</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/status" class="nav-link">&#9432;</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+                </form>
+            </div>
+        </nav>
     </header>
     <main id="wrap">
-        <div class="container">
+        <div class="container py-4">
             {{- template "specific" . -}}
         </div>
     </main>
-    <footer id="footer" class="footer">
-        <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-dark bg-trezor">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://satoshilabs.com/" target="_blank" rel="noopener noreferrer">© 2019 SatoshiLabs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/random-zebra" target="_blank" rel="noopener noreferrer">© 2020 Random.Zebra</a>
-                    </li>
-                </ul>
-                <span class="d-none ml-md-auto d-sm-flex navbar-form navbar-nav">
-                    <a href="/sendtx" class="nav-link active">Send Transaction</a>
-                </span>
-                <ul class="navbar-nav flex-row ml-md-auto d-none d-sm-flex">
-                    <li class="nav-item">
-                        <a class="nav-link" target="_blank" rel="noopener noreferrer" href="http://trezor.io">made with TREZOR Blockbook</a>
-                    </li>
-                </ul>
-            </nav>
+    <footer id="footer" class="footer bg-purple">
+        <div class="container py-4">
+            <div class="row align-items-center justify-content-center text-center">
+                <div class="col-md-4 pb-2 pb-md-0">
+                    <p class="m-0 p-0">
+                        <a target="_blank" rel="noopener noreferrer" class="mx-2" href="https://pivx.org">PIVX.org</a>
+                        <a target="_blank" rel="noopener noreferrer" class="mx-2" href="https://github.com/PIVX-Project">Github</a>
+                        <a target="_blank" rel="noopener noreferrer" class="mx-2" href="https://forum.pivx.org">Forum</a>
+                        <a target="_blank" rel="noopener noreferrer" class="mx-2" href="https://discord.pivx.org">Discord</a>
+                    </p>
+                </div>
+                <div class="col-md-4 pb-2 pb-md-0">
+                    <p class="m-0 p-0">
+                        <a href="http://satoshilabs.com/" target="_blank" rel="noopener noreferrer">© 2019 SatoshiLabs</a> / <a href="https://github.com/random-zebra" target="_blank" rel="noopener noreferrer">© 2020 Random.Zebra</a>
+                    </p>
+                </div>
+                <div class="col-md-4 pb-2 pb-md-0">
+                    <p class="m-0 p-0">
+                        <a target="_blank" rel="noopener noreferrer" href="http://trezor.io">Made with TREZOR Blockbook</a>
+                    </p>
+                </div>
+            </div>
         </div>
     </footer>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+{{- if .IsCharts -}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+<script src="/static/js/charts.js"></script>
+{{- end -}}
 </body>
-
 </html>
