@@ -441,6 +441,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
 		"formatUnixTime":           formatUnixTime,
 		"formatAmount":             s.formatAmount,
 		"formatAbsAmount":				  s.formatAbsAmount,
+		"formatNegatedAmount":  		s.formatNegatedAmount,
 		"formatAmountWithDecimals": formatAmountWithDecimals,
 		"setTxToTemplateData":      setTxToTemplateData,
     "isOwnAddress":             isOwnAddress,
@@ -1289,6 +1290,16 @@ func (s *PublicServer) formatAbsAmount(a *api.Amount) string {
 	}
 	x := (big.Int)(*a)
 	x.Abs(&x)
+	return s.formatAmount((*api.Amount)(&x))
+}
+
+// format the negated value of bigInt
+func (s *PublicServer) formatNegatedAmount(a *api.Amount) string {
+	if a == nil {
+		return ""
+	}
+	x := (big.Int)(*a)
+	x.Neg(&x)
 	return s.formatAmount((*api.Amount)(&x))
 }
 

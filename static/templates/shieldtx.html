@@ -9,7 +9,7 @@
     <table class="table data-table">
         <tbody>
             <tr>
-                <td style="width: 60%;">In Block</td>
+                <td style="width: 50%;">In Block</td>
                 <td class="data">
                   {{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
                   {{- else -}}Unconfirmed{{end}}
@@ -34,22 +34,22 @@
     <table class="table data-table">
         <tbody>
             <tr>
-                <td style="width: 60%;">Time</td>
+                <td style="width: 40%;">Time</td>
                 <td class="data">
                   {{- if $tx.Blocktime -}}{{formatUnixTime $tx.Blocktime}}{{end}}
                 </td>
             </tr>
             <tr>
-                <td>Shielded Spends Count</td>
+                <td>Notes Spent</td>
                 <td class="data">{{$tx.ShieldIns}}</td>
             </tr>
             <tr>
-                <td>Shielded Outputs Count</td>
+                <td>Notes Minted</td>
                 <td class="data">{{ $tx.ShieldOuts}}</td>
             </tr>
-            <tr title="Total shielded spends value minus total shielded outputs value">
-                <td>Shield Value Transfer</td>
-                <td class="data">{{formatAmount $tx.ShieldValBal}} {{$cs}}</td>
+            <tr title="Total value transferred to the SHIELD pool">
+                <td>Shield Supply Delta</td>
+                <td class="data">{{formatNegatedAmount $tx.ShieldValBal}} {{$cs}}</td>
             </tr>
         </tbody>
     </table>
