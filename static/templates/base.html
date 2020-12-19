@@ -6,9 +6,19 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/css/main.css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="{{.CoinName}} Explorer">
-    <meta property="og:image" content="https://pivx.org/wp-content/uploads/2017/01/PIVX_illustrated_white.png" />
     <title>{{.CoinName}} Explorer</title>
+    <meta name="description" content="Search {{.CoinName}} Blockchain for block, transaction, address or xpub. You can also send a transaction or check network stats and github activity.">
+    <meta property="og:title" content="{{.CoinName}} Explorer" />
+    <meta property="og:description" content="Search {{.CoinName}} Blockchain for block, transaction, address or xpub. You can also send a transaction or check network stats and github activity." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://{{ url }}" /><!-- url -->
+    <meta property="og:site_name" content="{{.CoinName}} Explorer" />
+    <meta property="og:locale" content="en" />
+    <meta property="og:image" content="https://{{ url }}/static/pivx-og.jpg"><!-- image url - needs to be full image url, not just "/static/pivx-og.jpg", jpg preferred by facebook -->
+    <meta property="og:image:alt" content="{{.CoinName}} Image" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@_PIVX">
+    <meta name="twitter:creator" content="@_PIVX">    
     <link rel="icon" type="image/png" href="/static/pivx-32.png" />
 </head>
 <body class="d-flex flex-column">
@@ -49,8 +59,8 @@
             <div class="container pb-4 pt-2">
                 <form id="search" class="mx-2 my-auto d-inline w-100" action="/search" method="get">
                     <div class="input-group">
-                        <label class="mr-sm-2 mb-0 sr-only" for="search">Search</label>
-                        <input type="text" class="form-control" name="q" placeholder="Search for block, transaction, address or xpub">
+                        <label class="mr-sm-2 mb-0 sr-only" for="q">Search</label>
+                        <input type="text" class="form-control rounded-left" name="q" placeholder="Search for block, transaction, address or xpub">
                         <span class="input-group-append">
                             <button class="btn btn-outline-secondary" type="button">GO</button>
                         </span>
