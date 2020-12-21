@@ -95,9 +95,9 @@ type Tx struct {
     Time             int64       `json:"time,omitempty"`
     Blocktime        int64       `json:"blocktime,omitempty"`
     // PIVX Shield
-    VShieldIn                 []VShieldIn  `json:"vShieldedSpend,omitempty"`
+    VShieldIn              []VShieldIn  `json:"vShieldedSpend,omitempty"`
     VShieldOut             []VShieldOut `json:"vShieldedOutput,omitempty"`
-    ShieldValBal         big.Int          `json:"valueBalanceSat"`
+    ShieldValBal           big.Int          `json:"valueBalanceSat"`
 
     CoinSpecificData interface{} `json:"-"`
 }
@@ -163,7 +163,7 @@ type ChainInfo struct {
     Timeoffset      float64 `json:"timeoffset"`
     Warnings        string  `json:"warnings"`
   TransparentSupply   json.Number `json:"transparentsupply"`
-    ShieldedSupply   json.Number `json:"shieldedsupply"`
+    ShieldSupply   json.Number `json:"shieldsupply"`
     MoneySupply   json.Number `json:"moneysupply"`
   MasternodeCount int `json:"masternodecount"`
   NextSuperBlock int `json:"masternodecount"`

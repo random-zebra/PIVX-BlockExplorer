@@ -189,8 +189,8 @@ type Tx struct {
     Size             int               `json:"size,omitempty"`
     ValueOutSat      *Amount           `json:"value"`
     ValueInSat       *Amount           `json:"valueIn,omitempty"`
-    ShieldIns        int               `json:"shieldedIns,omitempty"`
-    ShieldOuts       int               `json:"shieldedOuts,omitempty"`
+    ShieldIns        int               `json:"shieldIns,omitempty"`
+    ShieldOuts       int               `json:"shielOuts,omitempty"`
     ShieldValBal     *Amount           `json:"valueBalanceSat,omitempty"`
     FeesSat          *Amount           `json:"fees,omitempty"`
     Hex              string            `json:"hex,omitempty"`
@@ -357,7 +357,7 @@ type BackendInfo struct {
     Timeoffset         float64      `json:"timeOffset"`
     Warnings           string       `json:"warnings"`
     TransparentSupply  json.Number  `json:"transparentsupply"`
-    ShieldedSupply     json.Number  `json:"shieldedsupply"`
+    ShieldSupply       json.Number  `json:"shieldsupply"`
     MoneySupply        json.Number  `json:"moneysupply"`
     MasternodeCount    int          `json:"masternodecount"`
     NextSuperBlock     int          `json:"masternodecount"`

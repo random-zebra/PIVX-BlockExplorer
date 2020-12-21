@@ -454,7 +454,7 @@ func (s *PublicServer) parseTemplates() []*template.Template {
         "formatSupply":             formatSupply,
         "getPercent":               getPercent,
         "isP2CS":                   isP2CS,
-        "IsShielded":               IsShielded,
+        "IsShield":                 IsShield,
         "IsPositive":               IsPositive,
     }
     var createTemplate func(filenames ...string) *template.Template
@@ -583,7 +583,7 @@ func (s *PublicServer) explorerTx(w http.ResponseWriter, r *http.Request) (tpl, 
     }
     data := s.newTemplateData()
     data.Tx = tx
-    if IsShielded(tx) {
+    if IsShield(tx) {
         return shieldTxTpl, data, nil
     }
     return txTpl, data, nil
@@ -1279,8 +1279,8 @@ func isP2CS(addrs []string) bool {
                  (addrs[0][0:1] == "S" || addrs[0][0:1] == "W"))
 }
 
-// returns true if shielded transaction
-func IsShielded(tx *api.Tx) bool {
+// returns true if shield transaction
+func IsShield(tx *api.Tx) bool {
     if tx.ShieldIns > 0 || tx.ShieldOuts > 0 {
         return true
     }

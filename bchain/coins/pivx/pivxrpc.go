@@ -116,8 +116,8 @@ type ResGetInfo struct {
     Error  *bchain.RPCError `json:"error"`
     Result struct {
         TransparentSupply   json.Number `json:"transparentsupply"`
-                ShieldedSupply   json.Number `json:"shieldedsupply"`
-                MoneySupply   json.Number `json:"moneysupply"`
+        ShieldSupply   json.Number `json:"shieldsupply"`
+        MoneySupply   json.Number `json:"moneysupply"`
     } `json:"result"`
 }
 
@@ -165,7 +165,7 @@ func (b *PivXRPC) GetChainInfo() (*bchain.ChainInfo, error) {
         return nil, resGi.Error
     }
     rv.TransparentSupply = resGi.Result.TransparentSupply
-        rv.ShieldedSupply = resGi.Result.ShieldedSupply
+        rv.ShieldSupply = resGi.Result.ShieldSupply
         rv.MoneySupply = resGi.Result.MoneySupply
 
     glog.V(1).Info("rpc: getmasternodecount")

@@ -314,7 +314,7 @@ func (w *Worker) GetTransactionFromBchainTx(bchainTx *bchain.Tx, height uint32, 
             feesSat.SetUint64(0)
         }
     } else {
-        // add shielded net value to transparent fee
+        // add shield net value to transparent fee
         feesSat.Add(&feesSat, saplingBalance)
     }
 
@@ -477,7 +477,7 @@ func (w *Worker) txFromTxAddress(txid string, ta *db.TxAddresses, bi *db.BlockIn
     if feesSat.Sign() == -1 {
         feesSat.SetUint64(0)
     }
-    // add shielded net value to fee
+    // add shield net value to fee
     saplingBalance := &ta.ShieldValBal
     if IsZeroBigInt(saplingBalance) {
         saplingBalance = nil
@@ -1174,7 +1174,7 @@ func (w *Worker) GetSystemInfo(internal bool) (*SystemInfo, error) {
         Version:         ci.Version,
         Warnings:        ci.Warnings,
         TransparentSupply:  ci.TransparentSupply,
-        ShieldedSupply:     ci.ShieldedSupply,
+        ShieldSupply:     ci.ShieldSupply,
         MoneySupply:        ci.MoneySupply,
         MasternodeCount: ci.MasternodeCount,
         NextSuperBlock:  ci.NextSuperBlock,

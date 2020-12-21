@@ -13,7 +13,7 @@
                     <tbody>
                         {{- if gt $tx.ShieldIns 0 -}}
                         <tr><td>
-                          <span class="tx-addr">{{$tx.ShieldIns}} Shielded Spend{{- if gt $tx.ShieldIns 1 -}}s{{- end -}}</span>
+                          <span class="tx-addr">{{$tx.ShieldIns}} Shield Spend{{- if gt $tx.ShieldIns 1 -}}s{{- end -}}</span>
                           <span class="tx-amt">🛡</span>
                         </td></tr>
                         {{- end -}}
@@ -62,7 +62,7 @@
                     <tbody>
                         {{- if gt $tx.ShieldOuts 0 -}}
                         <tr><td>
-                          <span class="tx-addr">{{$tx.ShieldOuts}} Shielded Output{{- if gt $tx.ShieldOuts 1 -}}s{{- end -}}</span>
+                          <span class="tx-addr">{{$tx.ShieldOuts}} Shield Output{{- if gt $tx.ShieldOuts 1 -}}s{{- end -}}</span>
                           <span class="tx-amt">🛡</span>
                         </td></tr>
                         {{- end -}}
@@ -102,7 +102,7 @@
             {{- end -}}
             {{- if ne $saplingValue "" -}}
                <span class="txvalues txvalues-default" {{- if $IsSaplingValuePos -}} title="Net value transferred OUT of the Shield Pool"
-                                                       {{- else -}} title="Net value transferred INTO the Shielded Pool" {{- end -}}>
+                                                       {{- else -}} title="Net value transferred INTO the Shield Pool" {{- end -}}>
                  {{$saplingValue}} {{$cs}} &nbsp;
                  {{- if $IsSaplingValuePos -}}
                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-shield-slash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
