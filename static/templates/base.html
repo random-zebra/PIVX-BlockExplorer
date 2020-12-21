@@ -11,14 +11,14 @@
     <meta property="og:title" content="{{.CoinName}} Explorer" />
     <meta property="og:description" content="Search {{.CoinName}} Blockchain for block, transaction, address or xpub. You can also send a transaction or check network stats and github activity." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://{{ url }}" /><!-- url -->
+    <meta property="og:url" content="https://{{.Hostname}}{{.RelativeURL}}" />
     <meta property="og:site_name" content="{{.CoinName}} Explorer" />
     <meta property="og:locale" content="en" />
-    <meta property="og:image" content="https://{{ url }}/static/pivx-og.jpg"><!-- image url - needs to be full image url, not just "/static/pivx-og.jpg", jpg preferred by facebook -->
+    <meta property="og:image" content="https://{{.Hostname}}/static/pivx-og.jpg">
     <meta property="og:image:alt" content="{{.CoinName}} Image" />
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@_PIVX">
-    <meta name="twitter:creator" content="@_PIVX">    
+    <meta name="twitter:creator" content="@_PIVX">
     <link rel="icon" type="image/png" href="/static/pivx-32.png" />
 </head>
 <body class="d-flex flex-column">
