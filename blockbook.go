@@ -447,9 +447,6 @@ func newInternalState(coin, coinShortcut, coinLabel string, d *db.RocksDB) (*com
 	if err != nil {
 		glog.Error("get hostname ", err)
 	} else {
-		if i := strings.IndexByte(name, '.'); i > 0 {
-			name = name[:i]
-		}
 		is.Host = name
 	}
 	return is, nil

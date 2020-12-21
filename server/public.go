@@ -316,7 +316,7 @@ func (s *PublicServer) newTemplateData() *TemplateData {
         ChainType:        s.chainParser.GetChainType(),
         InternalExplorer: s.internalExplorer && !s.is.InitialSync,
         TOSLink:          api.Text.TOSLink,
-        IsIndex:          false,
+        Hostname:         s.is.Host,
         IsCharts:         false,
     }
 }
@@ -380,6 +380,10 @@ func (s *PublicServer) htmlTemplateHandler(handler func(w http.ResponseWriter, r
                 }
             }
         }
+        data.RelativeURL = r.URL.Path
+        if data.RelativeURL == "/" {
+            data.RelativeURL = ""
+        }
     }
 }
 
@@ -426,13 +430,14 @@ type TemplateData struct {
     NextPage             int
     PagingRange          []int
     PageParams           template.URL
+    Hostname             string
+    RelativeURL          string
     TOSLink              string
     SendTxHex            string
     Status               string
     NonZeroBalanceTokens bool
-    IsIndex              bool
-      IsCharts             bool
-      ChartData            string
+    IsCharts             bool
+    ChartData            string
 }
 
 func (s *PublicServer) parseTemplates() []*template.Template {
@@ -781,7 +786,6 @@ func (s *PublicServer) explorerIndex(w http.ResponseWriter, r *http.Request) (tp
         return errorTpl, nil, err
     }
     data := s.newTemplateData()
-    data.IsIndex = true
     data.Info = si
     data.Blocks = blocks
     return indexTpl, data, nil
