@@ -1,7 +1,7 @@
 {
   "coin": {
     "name": "PIVX Testnet",
-    "shortcut": "tPIVX",
+    "shortcut": "tPIV",
     "label": "PIVX Testnet",
     "alias": "pivx_testnet"
   },

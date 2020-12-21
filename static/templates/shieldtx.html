@@ -1,27 +1,26 @@
 {{define "specific"}}{{$cs := .CoinShortcut}}{{$tx := .Tx}}
-<h1>Transaction</h1>
+<h1>Shield Transaction</h1>
 <div class="alert alert-data ellipsis">
     <span class="data">{{$tx.Txid}}</span>
 </div>
 <h3>Summary</h3>
-<div class="data-div">
+<div class="row">
+  <div class="col-md-6">
     <table class="table data-table">
         <tbody>
             <tr>
-                <td style="width: 25%;">In Block</td>
-                <td class="data">{{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
-                {{- else -}}Unconfirmed{{end}}</td>
+                <td style="width: 35%;">In Block</td>
+                <td class="data">
+                  {{- if $tx.Confirmations -}}<a href="/block/{{$tx.Blockheight}}">{{$tx.Blockheight}}</a>
+                  {{- else -}}Unconfirmed{{end}}
+                </td>
             </tr>
             <tr>
-                <td style="width: 25%;">Time</td>
-                <td class="data">{{- if $tx.Blocktime -}}{{formatUnixTime $tx.Blocktime}}{{end}}</td>
-            </tr>
-            <tr>
-                <td>Total Input</td>
+                <td>Total Transparent Input</td>
                 <td class="data">{{formatAmount $tx.ValueInSat}} {{$cs}}</td>
             </tr>
             <tr>
-                <td>Total Output</td>
+                <td>Total Transparent Output</td>
                 <td class="data">{{formatAmount $tx.ValueOutSat}} {{$cs}}</td>
             </tr>
             <tr>
@@ -30,6 +29,31 @@
             </tr>
         </tbody>
     </table>
+  </div>
+  <div class="col-md-6">
+    <table class="table data-table">
+        <tbody>
+            <tr>
+                <td style="width: 35%;">Time</td>
+                <td class="data">
+                  {{- if $tx.Blocktime -}}{{formatUnixTime $tx.Blocktime}}{{end}}
+                </td>
+            </tr>
+            <tr>
+                <td>Shield Notes Spent</td>
+                <td class="data">{{$tx.ShieldIns}}</td>
+            </tr>
+            <tr>
+                <td>Shield Notes Minted</td>
+                <td class="data">{{ $tx.ShieldOuts}}</td>
+            </tr>
+            <tr title="Total value transferred to the SHIELD pool">
+                <td>Shield Supply Delta</td>
+                <td class="data">{{formatNegatedAmount $tx.ShieldValBal}} {{$cs}}</td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
 </div>
 <h3>Details</h3>
 <div class="data-div">

@@ -1,4 +1,4 @@
-{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}
+{{define "txdetail"}}{{$cs := .CoinShortcut}}{{$addr := .AddrStr}}{{$tx := .Tx}}{{$data := .}}{{$saplingValue := formatAbsAmount $tx.ShieldValBal}}{{- $IsSaplingValuePos := IsPositive $tx.ShieldValBal -}}
 <div class="alert alert-data">
     <div class="row line-bot">
         <div class="col-xs-7 col-md-8 ellipsis">
@@ -11,6 +11,12 @@
             <div class="row tx-in">
                 <table class="table data-table">
                     <tbody>
+                        {{- if gt $tx.ShieldIns 0 -}}
+                        <tr><td>
+                          <span class="tx-addr">{{$tx.ShieldIns}} Shielded Spend{{- if gt $tx.ShieldIns 1 -}}s{{- end -}}</span>
+                          <span class="tx-amt">🛡</span>
+                        </td></tr>
+                        {{- end -}}
                         {{- range $vin := $tx.Vin -}}
                         <tr{{if isOwnAddresses $data $vin.Addresses}} class="tx-own"{{end}}>
                             <td>
@@ -40,10 +46,6 @@
                                 {{- end -}}
                             </td>
                         </tr>
-                        {{- else -}}
-                        <tr>
-                            <td>No Inputs</td>
-                        </tr>
                         {{- end -}}
                     </tbody>
                 </table>
@@ -58,6 +60,12 @@
             <div class="row tx-out">
                 <table class="table data-table">
                     <tbody>
+                        {{- if gt $tx.ShieldOuts 0 -}}
+                        <tr><td>
+                          <span class="tx-addr">{{$tx.ShieldOuts}} Shielded Output{{- if gt $tx.ShieldOuts 1 -}}s{{- end -}}</span>
+                          <span class="tx-amt">🛡</span>
+                        </td></tr>
+                        {{- end -}}
                         {{- range $vout := $tx.Vout -}}
                         <tr{{if isOwnAddresses $data $vout.Addresses}} class="tx-own"{{end}}>
                             <td>
@@ -81,10 +89,6 @@
                                 </span>
                             </td>
                         </tr>
-                        {{- else -}}
-                        <tr>
-                            <td>No Outputs</td>
-                        </tr>
                         {{- end -}}
                     </tbody>
                 </table>
@@ -92,12 +96,29 @@
         </div>
     </div>
     <div class="row line-top">
-        <div class="col-xs-6 col-sm-4 col-md-4">
+        <div class="col-xs-6 col-sm-6 col-md-6">
             {{- if $tx.FeesSat -}}
             <span class="txvalues txvalues-default">Fee: {{formatAmount $tx.FeesSat}} {{$cs}}</span>
             {{- end -}}
+            {{- if ne $saplingValue "" -}}
+               <span class="txvalues txvalues-default" {{- if $IsSaplingValuePos -}} title="Net value transferred OUT of the Shield Pool"
+                                                       {{- else -}} title="Net value transferred INTO the Shielded Pool" {{- end -}}>
+                 {{$saplingValue}} {{$cs}} &nbsp;
+                 {{- if $IsSaplingValuePos -}}
+                   <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-shield-slash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M1.357 3.478c-.42 3.969.87 6.928 2.423 8.911a11.192 11.192 0 0 0 2.417 2.3c.371.256.715.451 1.007.586.27.124.558.225.796.225s.527-.101.796-.225c.292-.135.636-.33 1.007-.586.466-.32.983-.74 1.502-1.263l-.707-.707a9.692 9.692 0 0 1-1.362 1.147 5.934 5.934 0 0 1-.857.5c-.116.053-.21.089-.282.11A.73.73 0 0 1 8 14.5c-.007-.001-.038-.005-.097-.023a2.273 2.273 0 0 1-.282-.111 5.934 5.934 0 0 1-.857-.5 10.197 10.197 0 0 1-2.197-2.093C3.262 10.107 2.145 7.672 2.289 4.41l-.932-.932zm11.053 6.81c.971-1.785 1.594-4.15 1.187-7.129a.454.454 0 0 0-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491a45.4 45.4 0 0 0-1.041.29l-.806-.806a52.727 52.727 0 0 1 1.591-.45C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.458 3.355-.299 6.015-1.444 7.999l-.735-.735z"/>
+                     <path fill-rule="evenodd" d="M14.646 15.354l-14-14 .708-.708 14 14-.707.707z"/>
+                   </svg>
+                 {{- else -}}
+                   <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-shield-shaded" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                     <path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 0 0-2.725.802.454.454 0 0 0-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0 0 8 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 0 0 2.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 0 0-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815z"/>
+                     <path d="M8 2.25c.909 0 3.188.685 4.254 1.022a.94.94 0 0 1 .656.773c.814 6.424-4.13 9.452-4.91 9.452V2.25z"/>
+                   </svg>
+                 {{- end -}}
+               </span>
+            {{- end -}}
         </div>
-        <div class="col-xs-6 col-sm-8 col-md-8 text-right">
+        <div class="col-xs-6 col-sm-6 col-md-6 text-right">
             {{- if $tx.Confirmations -}}
             <span class="txvalues txvalues-success">{{$tx.Confirmations}} Confirmations</span>
             {{- else -}}
