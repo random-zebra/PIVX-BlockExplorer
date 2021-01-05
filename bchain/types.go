@@ -95,8 +95,8 @@ type Tx struct {
     Time             int64       `json:"time,omitempty"`
     Blocktime        int64       `json:"blocktime,omitempty"`
     // PIVX Shield
-    VShieldIn              []VShieldIn  `json:"vShieldedSpend,omitempty"`
-    VShieldOut             []VShieldOut `json:"vShieldedOutput,omitempty"`
+    VShieldIn              []VShieldIn  `json:"vShieldSpend,omitempty"`
+    VShieldOut             []VShieldOut `json:"vShieldOutput,omitempty"`
     ShieldValBal           big.Int          `json:"valueBalanceSat"`
 
     CoinSpecificData interface{} `json:"-"`
