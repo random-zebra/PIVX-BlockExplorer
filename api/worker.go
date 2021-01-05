@@ -496,8 +496,8 @@ func (w *Worker) txFromTxAddress(txid string, ta *db.TxAddresses, bi *db.BlockIn
         ValueOutSat:   (*Amount)(&valOutSat),
         Vin:           vins,
         Vout:          vouts,
-        ShieldIns:     ta.ShieldIns,
-        ShieldOuts:    ta.ShieldOuts,
+        ShieldIns:     int(ta.ShieldIns),
+        ShieldOuts:    int(ta.ShieldOuts),
         ShieldValBal:  (*Amount)(saplingBalance),
     }
     return r
