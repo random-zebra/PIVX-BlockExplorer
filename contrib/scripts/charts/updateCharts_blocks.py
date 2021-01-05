@@ -67,26 +67,24 @@ try:
 
 except FileNotFoundError:
     # first run (hardcoded)
-    if isTestnet:
-        supply_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "supply_old-testnet.json")
-        network_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "network_old-testnet.json")
-    else:
-        supply_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "supply_old.json")
-        network_data_file_cache = os.path.join("/opt/coins/blockbook/plot_data", "network_old.json")
-    try:
-        with open(supply_data_file_cache, 'r') as f:
-            supply_data = json.load(f)
-
-        with open(network_data_file_cache, 'r') as f:
-            network_data = json.load(f)
-
-    except FileNotFoundError as e:
-        print("No cache files found. Closing")
-        raise e
-    # delete cache
-    del supply_data["pivSupply"]
-    os.remove(supply_data_file_cache)
-    os.remove(network_data_file_cache)
+    print("First run...")
+    supply_data = {}
+    supply_data["blocks_axis"] = [0]
+    supply_data["time_axis"] = [0]
+    supply_data["zpivMints"] = {}
+    supply_data["zpivSupply"] = {}
+    for k in ZC_DENOMS:
+        supply_data["zpivMints"]["denom_%d" % k] = [0]
+        supply_data["zpivSupply"]["denom_%d" % k] = [0]
+    network_data = {}
+    network_data["blocks_axis"] = [0]
+    network_data["time_axis"] = [0]
+    network_data["difficulty"] = [0]
+    network_data["blocktime"] = [0]
+    network_data["blocksize"] = [0]
+    network_data["txs"] = [0]
+    network_data["fees_ttl"] = [0]
+    network_data["fees_perKb"] = [0]
 
 # Check if a reorg occurred
 last_block_hash = conn.getblockhash(supply_data["blocks_axis"][-1])
@@ -129,13 +127,8 @@ while supply_data["blocks_axis"][-1] + 100 <= blockCount:
     # get mints - zpiv supply
     spends = {}
     for k in ZC_DENOMS:
-        # mints always zero after cache
         supply_data["zpivMints"]["denom_%d" % k].append(0)
-        # get spends in range
-        spends["denom_%d" % k] = int(block_stats["spendcount"]["denom_%d" % k]) + int(block_stats["publicspendcount"]["denom_%d" % k])
-        # calculate supply
-        new_zpiv_supply = (supply_data["zpivMints"]["denom_%d" % k][-1] - spends["denom_%d" % k]) * k
-        supply_data["zpivSupply"]["denom_%d" % k].append(supply_data["zpivSupply"]["denom_%d" % k][-1] + new_zpiv_supply)
+        supply_data["zpivSupply"]["denom_%d" % k].append(0)
 
 
     # get tx count and fees
