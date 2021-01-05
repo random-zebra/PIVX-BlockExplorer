@@ -612,7 +612,7 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
             }
         }
     }
-    // process inputs
+    // process inputs (and sapling Data)
     for txi := range block.Txs {
         tx := &block.Txs[txi]
         spendingTxid := blockTxIDs[txi]
@@ -703,6 +703,10 @@ func (d *RocksDB) processAddressesBitcoinType(block *bchain.Block, addresses add
                 }
             }
         }
+        // process sapling data
+        ta.ShieldIns = uint32(len(tx.VShieldIn))
+        ta.ShieldOuts = uint32(len(tx.VShieldIn))
+        ta.ShieldValBal = tx.ShieldValBal
     }
     return nil
 }
