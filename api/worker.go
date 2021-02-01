@@ -754,7 +754,7 @@ func (w *Worker) GetAddress(address string, page int, txsOnPage int, option Acco
             return nil, errors.Annotatef(err, "getAddressTxids %v true", addrDesc)
         }
         for _, txid := range txm {
-            tx, err := w.GetTransaction(txid, false, false)
+            tx, err := w.GetTransaction(txid, false, true)
             // mempool transaction may fail
             if err != nil || tx == nil {
                 glog.Warning("GetTransaction in mempool: ", err)

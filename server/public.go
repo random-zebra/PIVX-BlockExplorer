@@ -684,9 +684,9 @@ func (s *PublicServer) explorerAddress(w http.ResponseWriter, r *http.Request) (
         return errorTpl, nil, api.NewAPIError("Missing address", true)
     }
     s.metrics.ExplorerViews.With(common.Labels{"action": "address"}).Inc()
-    page, _, _, filter, filterParam, _ := s.getAddressQueryParams(r, api.AccountDetailsTxHistoryLight, txsOnPage)
+    page, _, _, filter, filterParam, _ := s.getAddressQueryParams(r, api.AccountDetailsTxHistory, txsOnPage)
     // do not allow details to be changed by query params
-    address, err := s.api.GetAddress(addressParam, page, txsOnPage, api.AccountDetailsTxHistoryLight, filter)
+    address, err := s.api.GetAddress(addressParam, page, txsOnPage, api.AccountDetailsTxHistory, filter)
     if err != nil {
         return errorTpl, nil, err
     }
