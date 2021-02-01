@@ -46,10 +46,6 @@ class ApiClient:
         return self.checkResponse("tx", tx_hash)
 
 
-# --------------------------------------------------
-# Constants
-
-ZC_DENOMS = [1, 5, 10, 50, 100, 500, 1000, 5000]
 
 # --------------------------------------------------
 
@@ -71,11 +67,8 @@ except FileNotFoundError:
     supply_data = {}
     supply_data["blocks_axis"] = [0]
     supply_data["time_axis"] = [0]
-    supply_data["zpivMints"] = {}
-    supply_data["zpivSupply"] = {}
-    for k in ZC_DENOMS:
-        supply_data["zpivMints"]["denom_%d" % k] = [0]
-        supply_data["zpivSupply"]["denom_%d" % k] = [0]
+    supply_data["shield_supply"] = [0]
+
     network_data = {}
     network_data["blocks_axis"] = [0]
     network_data["time_axis"] = [0]
@@ -93,11 +86,7 @@ if (
         last_block_hash != supply_data["lastBlockHash"]
 ):
     # remove 3 datapoints to be extra safe
-    supply_data["lastBlockHash"] = last_block_hash
-    for data_key in ["zpivSupply", "zpivMints"]:
-        for denom_key in supply_data[data_key]:
-            supply_data[data_key][denom_key] = supply_data[data_key][denom_key][:-3]
-    for data_key in ["blocks_axis", "time_axis"]:
+    for data_key in ["blocks_axis", "time_axis", "shield_supply"]:
         supply_data[data_key] = supply_data[data_key][:-3]
 
     for data_key in network_data:
@@ -113,6 +102,7 @@ while supply_data["blocks_axis"][-1] + 100 <= blockCount:
     supply_data["lastBlockHash"] = conn.getblockhash(new_block_num)
     print("Getting block %d..." % new_block_num)
     block = conn.getblock(supply_data["lastBlockHash"], True)
+    blockheader = conn.getblockheader(supply_data["lastBlockHash"], True)
 
     # get time, blocktime, blocksize and difficulty
     supply_data["time_axis"].append(int(block["time"]))
@@ -124,16 +114,12 @@ while supply_data["blocks_axis"][-1] + 100 <= blockCount:
     # fetch blockindexstats over 100 blocks: [N, N+99]
     block_stats = conn.getblockindexstats(new_block_num-100, 100)
 
-    # get mints - zpiv supply
-    spends = {}
-    for k in ZC_DENOMS:
-        supply_data["zpivMints"]["denom_%d" % k].append(0)
-        supply_data["zpivSupply"]["denom_%d" % k].append(0)
-
+    # get shield supply
+    supply_data["shield_supply"].append(float(blockheader["shield_pool_value"]["chainValue"]))
 
     # get tx count and fees
     network_data["txs"].append(int(block_stats["txcount_all"]))
-    network_data["fees_ttl"].append(float(block_stats["ttlfee_all"]))
+    network_data["fees_ttl"].append(float(block_stats["ttlfee"]))
     network_data["fees_perKb"].append(float(block_stats["feeperkb"]))
 
     # update range
