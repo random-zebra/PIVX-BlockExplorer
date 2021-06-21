@@ -28,7 +28,15 @@ const (
     MainnetMagic wire.BitcoinNet = 0xe9fdc490
     TestnetMagic wire.BitcoinNet = 0xba657645
 
-    // Zerocoin op codes
+    // Opcodes
+    OP_IF = 0x63
+    OP_ELSE = 0x67
+    OP_ENDIF = 0x68
+    OP_DUP = 0x76
+    OP_ROT = 0x7b
+    OP_EQUALVERIFY = 0x88
+    OP_HASH160 = 0xa9
+    OP_CHECKSIG = 0xac
     OP_ZEROCOINMINT  = 0xc1
     OP_ZEROCOINSPEND  = 0xc2
     OP_CHECKCOLDSTAKEVERIFY = 0xd1
@@ -327,7 +335,18 @@ func isZeroCoinSpendScript(signatureScript []byte) bool {
 }
 
 func isP2CSScript(signatureScript []byte) bool {
-    return len(signatureScript) > 50 && signatureScript[4] == OP_CHECKCOLDSTAKEVERIFY
+    return len(signatureScript) == 51 &&
+           signatureScript[0] == OP_DUP &&
+           signatureScript[1] == OP_HASH160 &&
+           signatureScript[2] == OP_ROT &&
+           signatureScript[3] == OP_IF &&
+           signatureScript[4] == OP_CHECKCOLDSTAKEVERIFY &&
+           signatureScript[5] == 0x14 &&
+           signatureScript[26] == OP_ELSE &&
+           signatureScript[27] == 0x14 &&
+           signatureScript[48] == OP_ENDIF &&
+           signatureScript[49] == OP_EQUALVERIFY &&
+           signatureScript[50] == OP_CHECKSIG
 }
 
 // Checks if script is dummy internal address for Coinbase
